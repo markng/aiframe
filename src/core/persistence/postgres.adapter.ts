@@ -1,5 +1,5 @@
 import { PersistenceAdapter } from '../types';
-import { Pool, PoolConfig, QueryResult } from 'pg';
+import { Pool, PoolConfig, QueryResult, PoolClient } from 'pg';
 
 export interface PostgresAdapterConfig extends PoolConfig {
   table: string;
@@ -76,7 +76,7 @@ export class PostgresAdapter<T = unknown> implements PersistenceAdapter<T> {
     }
   }
 
-  async save(key: string, data: T): Promise<void> {
+  async save(key: string, data: T, client?: Pool | PoolClient): Promise<void> {
     await this.initialize();
 
     const query = `
@@ -86,10 +86,10 @@ export class PostgresAdapter<T = unknown> implements PersistenceAdapter<T> {
       DO UPDATE SET ${this.dataColumn} = $2, updated_at = CURRENT_TIMESTAMP;
     `;
 
-    await this.pool.query(query, [key, JSON.stringify(data)]);
+    await (client || this.pool).query(query, [key, JSON.stringify(data)]);
   }
 
-  async load(key: string): Promise<T | null> {
+  async load(key: string, client?: Pool | PoolClient): Promise<T | null> {
     await this.initialize();
 
     const query = `
@@ -98,13 +98,13 @@ export class PostgresAdapter<T = unknown> implements PersistenceAdapter<T> {
       WHERE ${this.keyColumn} = $1;
     `;
 
-    const result = await this.pool.query(query, [key]);
+    const result = await (client || this.pool).query(query, [key]);
     if (result.rows.length === 0) return null;
 
-    return JSON.parse(result.rows[0][this.dataColumn]);
+    return result.rows[0][this.dataColumn];
   }
 
-  async delete(key: string): Promise<void> {
+  async delete(key: string, client?: Pool | PoolClient): Promise<void> {
     await this.initialize();
 
     const query = `
@@ -112,10 +112,10 @@ export class PostgresAdapter<T = unknown> implements PersistenceAdapter<T> {
       WHERE ${this.keyColumn} = $1;
     `;
 
-    await this.pool.query(query, [key]);
+    await (client || this.pool).query(query, [key]);
   }
 
-  async query(filter: unknown): Promise<T[]> {
+  async query(filter: unknown, client?: Pool | PoolClient): Promise<T[]> {
     await this.initialize();
 
     // Convert filter to PostgreSQL JSONB query
@@ -127,8 +127,8 @@ export class PostgresAdapter<T = unknown> implements PersistenceAdapter<T> {
       WHERE ${conditions.query};
     `;
 
-    const result = await this.pool.query(query, conditions.params);
-    return result.rows.map(row => JSON.parse(row[this.dataColumn]));
+    const result = await (client || this.pool).query(query, conditions.params);
+    return result.rows.map(row => row[this.dataColumn]);
   }
 
   private buildJsonbConditions(filter: unknown): { query: string; params: unknown[] } {
@@ -158,7 +158,7 @@ export class PostgresAdapter<T = unknown> implements PersistenceAdapter<T> {
 
   // Transaction support
   async withTransaction<R>(
-    callback: (client: any) => Promise<R>
+    callback: (client: PoolClient) => Promise<R>
   ): Promise<R> {
     const client = await this.pool.connect();
     try {

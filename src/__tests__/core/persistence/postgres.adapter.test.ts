@@ -110,8 +110,8 @@ describe('PostgresAdapter', () => {
   describe('Transaction Support', () => {
     it('should handle successful transactions', async () => {
       await adapter.withTransaction(async (client) => {
-        await adapter.save('tx-key1', { value: 1 });
-        await adapter.save('tx-key2', { value: 2 });
+        await adapter.save('tx-key1', { value: 1 }, client);
+        await adapter.save('tx-key2', { value: 2 }, client);
       });
 
       const value1 = await adapter.load('tx-key1');
@@ -123,7 +123,7 @@ describe('PostgresAdapter', () => {
     it('should rollback failed transactions', async () => {
       try {
         await adapter.withTransaction(async (client) => {
-          await adapter.save('tx-key1', { value: 1 });
+          await adapter.save('tx-key1', { value: 1 }, client);
           throw new Error('Test error');
         });
       } catch (error) {

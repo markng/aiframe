@@ -55,29 +55,29 @@ describe('MigrationRunner', () => {
   });
 
   async function createTestMigration(name: string, version: number): Promise<void> {
-    const migration: Migration = {
-      id: `test-${version}`,
-      name,
-      timestamp: Date.now() + version,
-      async up(client: Pool) {
-        await client.query(`
-          -- Migration ${version} up
-          SELECT ${version} as version;
-        `);
-      },
-      async down(client: Pool) {
-        await client.query(`
-          -- Migration ${version} down
-          SELECT ${version} as version;
-        `);
-      }
-    };
+    const timestamp = Date.now() + version;
+    const content = `
+      module.exports = {
+        id: 'test-${version}',
+        name: '${name}',
+        timestamp: ${timestamp},
+        async up(client) {
+          await client.query(\`
+            -- Migration ${version} up
+            SELECT ${version} as version;
+          \`);
+        },
+        async down(client) {
+          await client.query(\`
+            -- Migration ${version} down
+            SELECT ${version} as version;
+          \`);
+        }
+      };
+    `;
 
-    const path = join(migrationsDir, `${name}.ts`);
-    await fs.writeFile(
-      path,
-      `module.exports = ${JSON.stringify(migration, null, 2)}`
-    );
+    const path = join(migrationsDir, `${name}.js`);
+    await fs.writeFile(path, content);
   }
 
   beforeEach(() => {
@@ -167,24 +167,23 @@ describe('MigrationRunner', () => {
   describe('Error Handling', () => {
     it('should rollback failed migrations', async () => {
       // Create a failing migration
-      await createTestMigration('004-fail', 4);
-      const failingPath = join(migrationsDir, '004-fail.ts');
-      await fs.writeFile(
-        failingPath,
-        `
+      const timestamp = Date.now() + 4;
+      const content = `
         module.exports = {
           id: 'test-4',
           name: '004-fail',
-          timestamp: ${Date.now() + 4},
+          timestamp: ${timestamp},
           async up(client) {
             throw new Error('Test error');
           },
           async down(client) {
             await client.query('SELECT 1');
           }
-        }
-        `
-      );
+        };
+      `;
+
+      const failingPath = join(migrationsDir, '004-fail.js');
+      await fs.writeFile(failingPath, content);
 
       const results = await runner.up();
       expect(results.find(r => r.name === '004-fail')?.status).toBe('error');
