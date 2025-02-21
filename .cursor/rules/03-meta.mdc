@@ -1,1 +1,75 @@
 description: AIFrame Meta Development Rules
+Guidelines for improving the framework and its development process.
+
+patterns: ["**/*"]
+
+rules:
+  - AI agents should suggest improvements to these rules
+  - Document all framework enhancement ideas
+  - Keep track of development patterns
+  - Share insights about AI-human collaboration
+  - Update documentation proactively
+  - Think about developer experience
+  - Consider both AI and human readability
+
+Rule Improvement Process:
+  - Identify gaps in current rules
+  - Suggest new patterns and practices
+  - Add concrete examples
+  - Update file references
+  - Remove outdated guidelines
+  - Clarify ambiguous rules
+  - Add context where needed
+
+AI Collaboration Guidelines:
+  - Explain reasoning behind suggestions
+  - Reference relevant code patterns
+  - Share alternative approaches
+  - Document edge cases found
+  - Suggest test scenarios
+  - Improve error messages
+  - Enhance type definitions
+
+Framework Evolution:
+  - Track feature requests
+  - Document breaking changes
+  - Plan deprecations carefully
+  - Consider backward compatibility
+  - Maintain upgrade guides
+  - Version rules appropriately
+
+Development Workflow:
+  - Use semantic commits
+  - Write detailed PR descriptions
+  - Update tests with changes
+  - Document breaking changes
+  - Keep rules in sync with code
+  - Review documentation updates
+  - Automate commits after significant changes:
+    - After implementing a feature
+    - After fixing a bug
+    - After updating tests
+    - After modifying interfaces
+    - After adding documentation
+    - After refactoring code
+    - After updating dependencies
+
+Commit Automation:
+  - Commit after each logical change
+  - Use semantic commit messages:
+    ```
+    feat: Add new feature
+    fix: Fix specific issue
+    docs: Update documentation
+    test: Add or modify tests
+    refactor: Code improvements
+    chore: Dependency updates
+    ```
+  - Include context in commit messages
+  - Reference related issues/PRs
+  - Group related changes
+  - Keep commits focused
+  - Run tests before committing
+
+@file README.md
+@file .cursor/rules/*.mdc 
