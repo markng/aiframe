@@ -139,8 +139,12 @@ describe('PostgresAdapter', () => {
       table: 'test_table'
     };
     
-    const adapter = new PostgresAdapter(invalidConfig);
-    await expect(adapter.initialize()).rejects.toThrow();
+    const invalidAdapter = new PostgresAdapter(invalidConfig);
+    try {
+      await expect(invalidAdapter.initialize()).rejects.toThrow();
+    } finally {
+      await invalidAdapter.disconnect();
+    }
   });
 
   it('should handle missing optional configuration', async () => {
@@ -153,13 +157,17 @@ describe('PostgresAdapter', () => {
       table: 'test_table'
     };
     
-    const adapter = new PostgresAdapter(minimalConfig);
-    await adapter.initialize();
-    
-    // Test basic operations with minimal config
-    await adapter.save('test-key', { value: 'test' });
-    const result = await adapter.load('test-key');
-    expect(result).toEqual({ value: 'test' });
+    const minimalAdapter = new PostgresAdapter(minimalConfig);
+    try {
+      await minimalAdapter.initialize();
+      
+      // Test basic operations with minimal config
+      await minimalAdapter.save('test-key', { value: 'test' });
+      const result = await minimalAdapter.load('test-key');
+      expect(result).toEqual({ value: 'test' });
+    } finally {
+      await minimalAdapter.disconnect();
+    }
   });
 
   it('should handle invalid filter conditions', async () => {

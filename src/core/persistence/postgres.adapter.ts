@@ -171,15 +171,41 @@ export class PostgresAdapter<T = unknown> implements PersistenceAdapter<T> {
     if (!this.pool) return;
     
     try {
+      // Only try to clean up if we're initialized
+      if (this.isInitialized) {
+        // Clean up any lingering transactions
+        const client = await this.pool.connect();
+        try {
+          await client.query('ROLLBACK');
+          await client.query('DISCARD ALL');
+          await client.query('DEALLOCATE ALL');
+        } catch (error) {
+          // Ignore cleanup errors
+          console.warn('Error during connection cleanup:', error);
+        } finally {
+          client.release();
+        }
+      }
+      
       // Wait for any in-progress operations to complete
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      // End the pool
-      await this.pool.end();
+      // End the pool with a timeout
+      const endPromise = this.pool.end();
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Pool end timeout')), 5000);
+      });
+      await Promise.race([endPromise, timeoutPromise]).catch(error => {
+        // Ignore pool end errors for uninitialized connections
+        if (this.isInitialized) {
+          throw error;
+        }
+        console.warn('Error ending uninitialized pool:', error);
+      });
       
       // Reset state
       this.isInitialized = false;
-      delete this.pool;
+      this.pool = undefined;
     } catch (error) {
       console.error('Error during disconnect:', error);
       throw error;
