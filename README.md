@@ -114,28 +114,32 @@ This framework is in early development. Contributions and suggestions are welcom
 
 ### Installation
 
-1. Install the AIFrame CLI globally:
+1. Create a new directory for your project and initialize it:
    ```bash
-   npm install -g create-aiframe-app
-   ```
-
-2. Create a new application:
-   ```bash
-   create-aiframe-app
-   ```
-
-3. Follow the interactive prompts:
-   ```
-   Project name: my-app
-   Description (optional): My first AIFrame application
-   Author (optional): Your Name
-   Database (postgres/mongodb/none) [none]: postgres
-   Features (comma-separated) [basic]: basic,auth,api
-   ```
-
-4. Once the project is generated, navigate to it and install dependencies:
-   ```bash
+   mkdir my-app
    cd my-app
+   git init
+   ```
+
+2. Install AIFrame from GitHub:
+   ```bash
+   npm install markng/aiframe
+   ```
+
+3. Initialize a new AIFrame application:
+   ```bash
+   npx create-aiframe-app
+   ```
+
+   Or clone the starter template:
+   ```bash
+   git clone https://github.com/markng/aiframe-starter.git .
+   rm -rf .git  # Remove the template's git history
+   git init     # Start fresh git history
+   ```
+
+4. Install dependencies:
+   ```bash
    npm install
    ```
 
