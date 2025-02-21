@@ -1,6 +1,6 @@
 {
   "name": "cogniframe",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A server-side web framework optimized for AI-human collaboration",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
