@@ -3,17 +3,19 @@ name: NPM Publish
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      id-token: write
+      contents: write  # Needed for creating releases
+      id-token: write  # Needed for npm provenance
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed for release notes generation
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -42,13 +44,16 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
+          name: ${{ github.ref_name }}
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to NPM
-        run: npm publish --provenance
+        run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
 
     services:
       postgres:
