@@ -1,7 +1,8 @@
 {
   "name": "cogniframe",
   "version": "0.3.2",
-  "description": "A server-side web framework optimized for AI-human collaboration",
+  "description": "A server-side web framework optimized for AI-human collaboration with automated CD workflow",
+  // Configuration for npm publishing and CD workflow
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
