@@ -1,6 +1,79 @@
 ---
 description: AIFrame Meta Development Rules
+Guidelines for AI development and code maintenance.
+
 patterns: ["**/*"]
+
+rules:
+  # Core Development Principles
+  - Follow intent-based architecture
+  - Maintain type safety
+  - Write self-documenting code
+  - Handle errors gracefully
+  - Test thoroughly
+
+  # Testing Protocol
+  - Run tests after EVERY code change
+  - Analyze test failures systematically:
+    * Identify the specific test case
+    * Review expected vs actual behavior
+    * Check related test cases for patterns
+  - Include test coverage in decision making
+  - Always provide test run button/link after changes
+  - Verify edge cases and boundary conditions
+
+  # Code Review Depth
+  - Examine surrounding context (minimum 10 lines)
+  - Check for patterns across similar files
+  - Consider edge cases explicitly
+  - Review error handling paths
+  - Verify type safety and null checks
+  - Look for potential race conditions
+  - Validate transaction boundaries
+
+  # Error Handling Guidelines
+  - Log meaningful error messages
+  - Include context in error reporting
+  - Consider recovery paths
+  - Maintain transaction integrity
+  - Preserve system state during failures
+  - Use appropriate error types
+  - Implement proper cleanup
+
+  # Documentation Standards
+  - Document WHY, not just WHAT
+  - Explain complex algorithms
+  - Note assumptions and prerequisites
+  - Update relevant documentation
+  - Include examples for non-obvious usage
+  - Keep README current
+  - Document breaking changes
+
+  # Performance Awareness
+  - Consider operation complexity
+  - Note resource-intensive operations
+  - Suggest optimizations when relevant
+  - Monitor transaction boundaries
+  - Be aware of memory usage
+  - Profile critical paths
+  - Consider scalability implications
+
+Getting Started:
+  1. Review existing documentation
+  2. Run test suite before changes
+  3. Make incremental improvements
+  4. Validate changes with tests
+  5. Update documentation as needed
+
+Best Practices:
+  - Use TypeScript strict mode
+  - Follow SOLID principles
+  - Write idiomatic code
+  - Keep functions focused
+  - Maintain separation of concerns
+
+@file src/server.ts
+@file README.md
 ---
 
 Process Guidelines:
@@ -55,6 +128,39 @@ Development Workflow:
   - Document breaking changes
   - Keep rules in sync with code
   - Review documentation updates
+  - Create feature branches for all changes
+  - Follow branch naming convention:
+    ```
+    feature/description-of-feature
+    fix/issue-description
+    docs/documentation-update
+    refactor/refactoring-description
+    test/test-addition-description
+    chore/maintenance-task
+    ```
+  - Branch from main for features
+  - Keep branches short-lived
+  - Delete branches after merge
+
+Pull Request Guidelines:
+  - Create PR for every feature branch
+  - Use PR template if available
+  - Link related issues
+  - Include test coverage
+  - Keep changes focused
+  - Request relevant reviewers
+  - Address review comments
+  - Squash commits before merge
+  - Delete branch after merge
+
+Branch Lifecycle:
+  - Create branch from main
+  - Commit changes following guidelines
+  - Keep branch up to date with main
+  - Create PR when ready
+  - Address review feedback
+  - Merge when approved
+  - Delete branch after merge
 
 Commit Guidelines:
   - Commit after each logical change
@@ -72,6 +178,33 @@ Commit Guidelines:
   - Group related changes
   - Keep commits focused
   - Run tests before committing
+
+Testing Guidelines:
+  - Keep test configuration in one place (package.json)
+  - Avoid generating test config files in CI
+  - Clean up test resources properly
+  - Handle database connections carefully
+  - Use environment variables for test configuration
+  - Document test environment requirements
+  - Consider CI/CD implications when writing tests
+
+CI/CD Best Practices:
+  - Keep CI workflows simple and focused
+  - Remove unnecessary steps (e.g., unused artifacts)
+  - Use explicit configuration options
+  - Clean up generated files before tests
+  - Document environment variables
+  - Handle test cleanup properly
+  - Consider matrix testing implications
+
+Database Testing:
+  - Initialize test databases properly
+  - Clean up after each test
+  - Handle connection pools carefully
+  - Use transactions where appropriate
+  - Document database requirements
+  - Consider CI environment differences
+  - Handle cleanup edge cases
 
 @file README.md
 @file .cursor/rules/*.mdc 
