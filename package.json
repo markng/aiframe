@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "jest --coverage --coverageReporters='text-summary' --coverageReporters='html'",
+    "test": "jest --coverage --coverageReporters='text-summary'",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "start": "node dist/server.js",
     "migrate": "ts-node src/core/persistence/migrations/cli.ts",
@@ -44,5 +44,23 @@
     "jsdom": "^26.0.0",
     "ts-jest": "^29.1.0",
     "ts-node-dev": "^2.0.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/__tests__/setup.ts"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.ts"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ]
   }
 }
