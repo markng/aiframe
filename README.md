@@ -105,6 +105,43 @@ AIFrame is designed to make web development more accessible to AI agents by:
 
 This framework is in early development. Contributions and suggestions are welcome!
 
+### Running Tests
+
+The test suite includes both unit tests and integration tests. Some tests require a PostgreSQL database.
+
+1. Set up PostgreSQL for integration tests:
+   ```bash
+   # Create a test database and user
+   createdb aiframe_test
+   createuser -s postgres  # Create superuser if it doesn't exist
+   ```
+
+2. Configure test environment:
+   ```bash
+   # Create .env.test file
+   cat > .env.test << EOL
+   POSTGRES_HOST=localhost
+   POSTGRES_PORT=5432
+   POSTGRES_DB=aiframe_test
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=postgres
+   EOL
+   ```
+
+3. Run the tests:
+   ```bash
+   # Run all tests
+   npm test
+
+   # Run specific test file
+   npm test -- src/__tests__/core/runtime.test.ts
+
+   # Run tests with coverage
+   npm test -- --coverage
+   ```
+
+Note: If PostgreSQL is not available, database-related tests will be skipped.
+
 ## Creating a New Application
 
 ### Prerequisites
