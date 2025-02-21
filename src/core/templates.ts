@@ -1,5 +1,6 @@
 import ejs from 'ejs';
 import path from 'path';
+import { promises as fs } from 'fs';
 import { ViewData } from './types';
 
 export class TemplateEngineError extends Error {
@@ -24,31 +25,42 @@ export class TemplateEngine {
 
     const normalizedPath = path.normalize(path.join(this.templatesDir, `${template}.ejs`));
     
-    // Double-check the normalized path is within templates dir
-    if (!normalizedPath.startsWith(this.templatesDir)) {
-      throw new TemplateEngineError('Invalid template path: attempted path traversal');
-    }
+    try {
+      // Resolve any symlinks to their real paths
+      const realPath = await fs.realpath(normalizedPath);
+      const realTemplatesDir = await fs.realpath(this.templatesDir);
+      
+      // Check if the resolved path is within templates directory
+      if (!realPath.startsWith(realTemplatesDir)) {
+        throw new TemplateEngineError('Invalid template path: attempted path traversal');
+      }
 
-    return new Promise((resolve, reject) => {
-      ejs.renderFile(normalizedPath, data, (err, str) => {
-        if (err) {
-          // Wrap EJS errors with consistent messaging
-          if (err.message.includes('ENOENT')) {
-            reject(new TemplateEngineError('Template file not found', err));
-          } else if (err.message.includes('Could not find the include file')) {
-            reject(new TemplateEngineError('Include file not found', err));
-          } else if (err.message.includes('is not defined')) {
-            reject(new TemplateEngineError('Function not available in template', err));
-          } else if (err.message.includes('include') && err.message.includes('circular')) {
-            reject(new TemplateEngineError('Circular include detected', err));
+      return new Promise((resolve, reject) => {
+        ejs.renderFile(realPath, data, (err, str) => {
+          if (err) {
+            // Wrap EJS errors with consistent messaging
+            if (err.message.includes('ENOENT')) {
+              reject(new TemplateEngineError('Template file not found', err));
+            } else if (err.message.includes('Could not find the include file')) {
+              reject(new TemplateEngineError('Include file not found', err));
+            } else if (err.message.includes('is not defined')) {
+              reject(new TemplateEngineError('Function not available in template', err));
+            } else if (err.message.includes('include') && err.message.includes('circular')) {
+              reject(new TemplateEngineError('Circular include detected', err));
+            } else {
+              reject(new TemplateEngineError('Template rendering failed', err));
+            }
           } else {
-            reject(new TemplateEngineError('Template rendering failed', err));
+            resolve(str as string);
           }
-        } else {
-          resolve(str as string);
-        }
+        });
       });
-    });
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+        throw new TemplateEngineError('Template file not found');
+      }
+      throw err;
+    }
   }
 
   // Helper to create a safe HTML string (escapes content)
