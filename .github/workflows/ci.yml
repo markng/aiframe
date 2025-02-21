@@ -6,6 +6,17 @@ on:
   pull_request:
     branches: [ main ]
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -51,7 +62,20 @@ jobs:
         POSTGRES_PASSWORD: postgres
         SQLITE_FILE: ':memory:'
 
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }} 
+    - name: Upload coverage artifact
+      if: matrix.node-version == '20.x'  # Only upload coverage from the latest Node.js version
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: coverage/lcov-report
+
+  deploy:
+    if: github.ref == 'refs/heads/main'  # Only deploy from main branch
+    needs: test
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 
