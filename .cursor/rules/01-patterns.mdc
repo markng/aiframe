@@ -1,5 +1,72 @@
 ---
-description: 
-globs: 
+description: AIFrame Framework Design Patterns
+patterns: ["src/core/**/*.ts", "src/features/**/*.ts", "src/components/**/*.ts"]
 ---
- 
+
+Implementation Guidelines:
+  - Start with interface definitions
+  - Use TypeScript's type system to enforce patterns
+  - Implement interfaces before concrete classes
+  - Make dependencies explicit through interfaces
+  - Use factory patterns for object creation
+  - Keep core interfaces minimal and focused
+  - Follow SOLID principles
+  - Use union types for type safety
+  - Implement error handling consistently
+  - Add type guards where needed
+  - Keep state immutable
+  - Use builders for complex objects
+  - Document edge cases
+
+Core Patterns:
+  - Intent Declaration:
+    ```typescript
+    export interface Intent {
+      name: string;
+      description: string;
+      capabilities: string[];
+      dataStructure: Record<string, unknown>;
+      userActions: UserAction[];
+    }
+    ```
+
+  - Component Structure:
+    ```typescript
+    export interface ServerComponent {
+      intent: Intent;
+      render: (data: ViewData) => Promise<string>;
+      handleAction: (req: Request, res: Response) => Promise<void>;
+      getState: () => unknown;
+    }
+    ```
+
+  - Adapter Pattern:
+    ```typescript
+    export interface PersistenceAdapter<T = unknown> {
+      save(key: string, data: T): Promise<void>;
+      load(key: string): Promise<T | null>;
+      delete(key: string): Promise<void>;
+      query(filter: unknown): Promise<T[]>;
+    }
+    ```
+
+  - Event Sourcing:
+    ```typescript
+    export interface EventStore {
+      append(streamId: string, events: StateEvent[]): Promise<void>;
+      read(streamId: string, fromVersion?: number): Promise<StateEvent[]>;
+      getSnapshot(streamId: string): Promise<StateSnapshot | null>;
+      saveSnapshot(streamId: string, snapshot: StateSnapshot): Promise<void>;
+    }
+    ```
+
+Type System Guidelines:
+  - Use discriminated unions for state transitions
+  - Leverage TypeScript's inference capabilities
+  - Create reusable type utilities
+  - Document type constraints
+  - Use generics judiciously
+
+@file src/core/types.ts
+@file src/core/persistence/types.ts
+@file src/core/persistence/factory.ts 

@@ -1,5 +1,48 @@
 ---
-description: 
-globs: 
----
 description: AIFrame Framework Development Philosophy
+patterns: ["src/core/**/*.ts", "src/features/**/*.ts"]
+---
+
+Core Principles:
+  - Intent-driven development
+  - Type-safe by default
+  - Explicit over implicit
+  - Composable components
+  - Testable by design
+  - AI-first documentation
+  - Rule-driven development
+
+AI Agent Responsibilities:
+  - Read and acknowledge all framework rules
+  - Reference specific rules when making decisions
+  - Explain how rules influenced choices
+  - Inform engineers about rule applications
+  - Suggest rule improvements based on experience
+
+Framework Guidelines:
+  - Framework development must prioritize AI-human collaboration
+  - Every feature must have clear, documented intent
+  - Maintain strict type safety throughout
+  - Keep the core minimal but extensible
+  - Document all design decisions
+  - Think in terms of AI-readable patterns
+  - Consider both human and AI developers as users
+
+Architecture Decisions:
+  - Server-side rendering for initial implementation
+  - Component-based for modularity
+  - Event sourcing for state management
+  - Adapter pattern for persistence
+  - Factory pattern for extensibility
+
+Future Considerations:
+  - Client-side hydration
+  - Component composition
+  - Plugin architecture
+  - GraphQL integration
+  - Real-time capabilities
+  - AI development tools
+
+@file src/core/types.ts
+@file src/core/runtime.ts
+@file README.md 
