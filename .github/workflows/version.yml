@@ -31,6 +31,9 @@ jobs:
           node-version: '20.x'
           cache: 'npm'
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Determine version bump type
         id: bump-type
         run: |
@@ -43,9 +46,24 @@ jobs:
             echo "type=patch" >> $GITHUB_OUTPUT
           fi
 
+      - name: Get current version
+        id: current-version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
       - name: Bump version
+        id: version-bump
         run: |
           BUMP_TYPE=$(echo "${{ steps.bump-type.outputs.type }}")
-          npm version $BUMP_TYPE -m "chore: bump version to %s [skip ci]"
+          NEW_VERSION=$(npm --no-git-tag-version version $BUMP_TYPE)
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          
+          # Update package.json
+          git add package.json
+          git commit -m "chore: bump version to ${NEW_VERSION} [skip ci]"
           git push
-          git push --tags 
+
+          # Create and push tag separately
+          git tag -a ${NEW_VERSION} -m "Release ${NEW_VERSION}"
+          git push origin ${NEW_VERSION} 

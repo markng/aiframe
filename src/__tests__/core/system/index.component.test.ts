@@ -3,16 +3,24 @@ import { Runtime } from '../../../core/runtime';
 import { join } from 'path';
 import { Request, Response } from 'express';
 import { TestComponent } from '../../utils/test-component';
+import { readFileSync } from 'fs';
 
 describe('IndexComponent', () => {
   let runtime: Runtime;
   let component: IndexComponent;
   let testComponent: TestComponent;
   let originalEnv: string | undefined;
+  let packageVersion: string;
 
   beforeAll(() => {
     originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'development';
+    // Read package version using absolute path
+    const packagePath = join(process.cwd(), 'package.json');
+    console.log('Reading package.json from:', packagePath);
+    const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'));
+    packageVersion = packageJson.version;
+    console.log('Package version:', packageVersion);
   });
 
   afterAll(() => {
@@ -20,7 +28,10 @@ describe('IndexComponent', () => {
   });
 
   beforeEach(() => {
-    runtime = new Runtime(join(__dirname, '../../../templates'));
+    // Use absolute path for templates
+    const templatesDir = join(process.cwd(), 'src/templates');
+    console.log('Using templates from:', templatesDir);
+    runtime = new Runtime(templatesDir);
     component = new IndexComponent(runtime);
     testComponent = new TestComponent();
   });
@@ -38,7 +49,7 @@ describe('IndexComponent', () => {
     it('should initialize with correct state', () => {
       const state = component.getState();
       expect(state.environment).toBe('development');
-      expect(state.frameworkVersion).toBe('0.1.0');
+      expect(state.frameworkVersion).toBe(packageVersion);
       expect(state.registeredComponents).toBeInstanceOf(Map);
     });
 
@@ -60,7 +71,7 @@ describe('IndexComponent', () => {
       const html = await component.render(viewData);
       expect(html).toContain('Welcome to AIFrame');
       expect(html).toContain('Quick Start');
-      expect(html).toContain('v0.1.0');
+      expect(html).toContain(`v${packageVersion}`);
     });
 
     it('should show registered components', async () => {

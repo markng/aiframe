@@ -16,16 +16,18 @@ export class IndexComponent implements ServerComponent {
   private state: IndexState;
 
   constructor(private runtime: Runtime) {
-    // Read package.json for version
-    const packageJson = JSON.parse(
-      readFileSync(join(__dirname, '../../../../package.json'), 'utf-8')
-    );
+    // Read package.json for version using absolute path
+    const packagePath = join(process.cwd(), 'package.json');
+    console.log('[IndexComponent] Reading package.json from:', packagePath);
+    const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'));
+    console.log('[IndexComponent] Package version:', packageJson.version);
 
     this.state = {
       registeredComponents: runtime.getComponents(),
       environment: process.env.NODE_ENV || 'development',
       frameworkVersion: packageJson.version
     };
+    console.log('[IndexComponent] State initialized with version:', this.state.frameworkVersion);
   }
 
   async render(data: ViewData): Promise<string> {
