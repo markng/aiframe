@@ -41,6 +41,11 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
+    - name: Remove any generated Jest config files
+      run: |
+        find . -name "jest.config.js" -delete
+        find . -name "jest.config.ts" -delete
+
     - name: Run tests
       run: npm test
       env:
