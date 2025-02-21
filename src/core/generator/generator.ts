@@ -580,10 +580,142 @@ rules:
 @file src/__tests__/setup.ts
 @file jest.config.js`;
 
+    // Development Philosophy Rule
+    const philosophyRule = `description: AIFrame Development Philosophy
+A guide to understanding the core principles and decisions behind AIFrame.
+
+patterns: ["**/*"]
+
+rules:
+  - Framework is designed for AI-human collaboration first
+  - Prefer explicit interfaces over implicit conventions
+  - Use TypeScript's type system to guide implementation
+  - Balance flexibility with type safety
+  - Make component intentions clear through metadata
+  - Keep the core simple, extend through adapters
+  - Design for testability from the start
+
+Key Decisions:
+  - Server-side rendering for simplicity and SEO
+  - Intent-based components for clear purpose
+  - Adapter pattern for database flexibility
+  - Event sourcing support for state tracking
+  - Migration system for schema evolution
+
+Future Directions:
+  - Client-side hydration
+  - Component composition
+  - Plugin system
+  - GraphQL support
+  - Real-time capabilities
+
+@file src/core/types.ts
+@file src/core/runtime.ts`;
+
+    // Design Patterns Rule
+    const patternsRule = `description: AIFrame Design Patterns
+Common patterns and best practices discovered during framework development.
+
+patterns: ["src/**/*.ts"]
+
+rules:
+  - Use factory pattern for creating adapters
+  - Implement interfaces for extensibility
+  - Keep component state immutable
+  - Use events for state changes
+  - Separate intent from implementation
+  - Make dependencies explicit
+  - Use composition over inheritance
+
+Component Patterns:
+  - Split complex components into features
+  - Use intent files for documentation
+  - Handle all edge cases explicitly
+  - Validate state transitions
+  - Keep render logic simple
+
+Database Patterns:
+  - Abstract storage operations
+  - Use transactions for consistency
+  - Implement retry mechanisms
+  - Handle connection failures
+  - Version all schemas
+
+@file src/core/persistence/factory.ts
+@file src/core/persistence/postgres.adapter.ts`;
+
+    // Implementation Insights Rule
+    const insightsRule = `description: AIFrame Implementation Insights
+Key learnings and insights from implementing the framework.
+
+patterns: ["src/**/*.ts"]
+
+rules:
+  - Start with interfaces before implementation
+  - Use union types for better type safety
+  - Keep core interfaces small and focused
+  - Document edge cases in tests
+  - Use builder pattern for complex objects
+  - Implement graceful fallbacks
+  - Consider error handling early
+
+Key Learnings:
+  - Type safety helps catch errors early
+  - Clear interfaces make extension easier
+  - Event sourcing simplifies debugging
+  - Migration system is essential
+  - Factory pattern provides flexibility
+
+Areas for Improvement:
+  - Add more type constraints
+  - Improve error messages
+  - Add performance monitoring
+  - Enhance testing utilities
+  - Add development tools
+
+@file src/core/types.ts
+@file src/core/persistence/types.ts`;
+
+    // Meta Development Rule
+    const metaRule = `description: AIFrame Meta Development Rules
+Guidelines for improving and extending the framework itself.
+
+patterns: ["**/*"]
+
+rules:
+  - Continuously improve these rule files
+  - Suggest new patterns as they emerge
+  - Document why decisions were made
+  - Keep track of alternatives considered
+  - Update rules when adding features
+  - Share insights through comments
+  - Think about AI-human collaboration
+
+Rule Improvement Process:
+  - Identify missing patterns
+  - Add concrete examples
+  - Update file references
+  - Add new rule categories
+  - Remove outdated rules
+  - Clarify existing rules
+
+AI Collaboration:
+  - Suggest rule improvements
+  - Identify missing patterns
+  - Add new examples
+  - Update documentation
+  - Share implementation insights
+
+@file .cursor/rules/*.mdc`;
+
     await fs.writeFile(join(targetDir, '.cursor/rules/framework.mdc'), frameworkRule);
     await fs.writeFile(join(targetDir, '.cursor/rules/components.mdc'), componentsRule);
     await fs.writeFile(join(targetDir, '.cursor/rules/database.mdc'), databaseRule);
     await fs.writeFile(join(targetDir, '.cursor/rules/templates.mdc'), templatesRule);
     await fs.writeFile(join(targetDir, '.cursor/rules/testing.mdc'), testingRule);
+    await fs.writeFile(join(targetDir, '.cursor/rules/philosophy.mdc'), philosophyRule);
+    await fs.writeFile(join(targetDir, '.cursor/rules/patterns.mdc'), patternsRule);
+    await fs.writeFile(join(targetDir, '.cursor/rules/insights.mdc'), insightsRule);
+    await fs.writeFile(join(targetDir, '.cursor/rules/meta.mdc'), metaRule);
   }
 } 
