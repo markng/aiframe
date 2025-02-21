@@ -292,7 +292,7 @@ Copyright © ${data.year} ${data.author}
     const content = `import express from 'express';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
-import csrf from 'csurf';
+import { doubleCsrf } from 'csrf-csrf';
 import path from 'path';
 import { Runtime } from 'aiframe';
 
@@ -311,7 +311,17 @@ app.use(session({
   saveUninitialized: false,
   cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
-app.use(csrf({ cookie: true }));
+
+const { generateToken, doubleCsrfProtection } = doubleCsrf({
+  getSecret: () => process.env.SESSION_SECRET || 'development-secret',
+  cookieName: 'csrf-token',
+  cookieOptions: {
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  }
+});
+
+app.use(doubleCsrfProtection);
 
 // Set up EJS as view engine
 app.set('view engine', 'ejs');
@@ -326,7 +336,8 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   res.status(500).render('error', {
     title: 'Error',
     message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err : {}
+    error: process.env.NODE_ENV === 'development' ? err : {},
+    csrfToken: generateToken(req, res)
   });
 });
 
@@ -691,7 +702,7 @@ export const dbConfig = {
       'express': '^4.18.2',
       'express-session': '^1.17.3',
       'cookie-parser': '^1.4.6',
-      'csurf': '^1.11.0',
+      'csrf-csrf': '^2.2.3',
       'ejs': '^3.1.9'
     };
 
@@ -719,7 +730,7 @@ export const dbConfig = {
       '@types/express': '^4.17.21',
       '@types/express-session': '^1.17.10',
       '@types/cookie-parser': '^1.4.6',
-      '@types/csurf': '^1.11.5',
+      '@types/csrf-csrf': '^2.2.3',
       '@types/ejs': '^3.1.5',
       '@types/jest': '^29.5.14',
       '@types/node': '^20.0.0',
