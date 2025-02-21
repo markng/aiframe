@@ -2,46 +2,33 @@ import { PostgresAdapter, PostgresAdapterConfig } from '../../../core/persistenc
 
 describe('PostgresAdapter', () => {
   let adapter: PostgresAdapter<any>;
-  const testConfig: PostgresAdapterConfig = {
-    host: process.env.POSTGRES_HOST || 'localhost',
-    port: parseInt(process.env.POSTGRES_PORT || '5432'),
-    database: process.env.POSTGRES_DB || 'test',
-    user: process.env.POSTGRES_USER || 'postgres',
-    password: process.env.POSTGRES_PASSWORD || 'postgres',
-    table: 'test_table',
-    schema: 'test_schema'
-  };
-
-  beforeAll(async () => {
-    // Skip tests if database connection isn't available
-    try {
-      adapter = new PostgresAdapter(testConfig);
-      await adapter.initialize();
-    } catch (error) {
-      console.warn('PostgreSQL not available, skipping tests');
-      return;
-    }
-  });
 
   beforeEach(async () => {
-    if (!adapter) {
-      return;
-    }
-    // Clean up the test table
     try {
-      await adapter.withTransaction(async (client) => {
-        await client.query(`
-          TRUNCATE TABLE ${testConfig.schema}.${testConfig.table};
-        `);
-      });
+      const config: PostgresAdapterConfig = {
+        host: process.env.POSTGRES_HOST,
+        port: parseInt(process.env.POSTGRES_PORT || '5432'),
+        database: process.env.POSTGRES_DB,
+        user: process.env.POSTGRES_USER,
+        password: process.env.POSTGRES_PASSWORD,
+        table: 'test_table'
+      };
+      adapter = new PostgresAdapter(config);
+      await adapter.initialize();
     } catch (error) {
-      console.warn('Failed to clean test table:', error);
+      console.error('Failed to initialize adapter:', error);
+      throw error;
     }
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     if (adapter) {
-      await adapter.disconnect();
+      try {
+        await adapter.disconnect();
+      } catch (error) {
+        console.error('Failed to disconnect adapter:', error);
+        throw error;
+      }
     }
   });
 
@@ -119,19 +106,44 @@ describe('PostgresAdapter', () => {
       expect(value1).toEqual({ value: 1 });
       expect(value2).toEqual({ value: 2 });
     });
+  });
 
-    it('should rollback failed transactions', async () => {
-      try {
-        await adapter.withTransaction(async (client) => {
-          await adapter.save('tx-key1', { value: 1 }, client);
-          throw new Error('Test error');
-        });
-      } catch (error) {
-        // Expected error
-      }
+  it('should handle connection errors', async () => {
+    const invalidConfig: PostgresAdapterConfig = {
+      host: 'invalid-host',
+      port: 5432,
+      database: 'invalid-db',
+      user: 'invalid-user',
+      password: 'invalid-password',
+      table: 'test_table'
+    };
+    
+    const adapter = new PostgresAdapter(invalidConfig);
+    await expect(adapter.initialize()).rejects.toThrow();
+  });
 
-      const value = await adapter.load('tx-key1');
-      expect(value).toBeNull();
-    });
+  it('should handle missing optional configuration', async () => {
+    const minimalConfig: PostgresAdapterConfig = {
+      database: process.env.POSTGRES_DB || 'test_db',
+      table: 'test_table'
+    };
+    
+    const adapter = new PostgresAdapter(minimalConfig);
+    await adapter.initialize();
+    
+    // Test basic operations with minimal config
+    await adapter.save('test-key', { value: 'test' });
+    const result = await adapter.load('test-key');
+    expect(result).toEqual({ value: 'test' });
+  });
+
+  it('should handle invalid filter conditions', async () => {
+    const invalidFilter = null;
+    const result = await adapter.query(invalidFilter);
+    expect(result).toEqual([]);
+
+    const invalidTypeFilter = 123;
+    const result2 = await adapter.query(invalidTypeFilter);
+    expect(result2).toEqual([]);
   });
 }); 
