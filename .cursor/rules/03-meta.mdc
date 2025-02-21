@@ -1,6 +1,79 @@
 ---
 description: AIFrame Meta Development Rules
-globs: 
+Guidelines for AI development and code maintenance.
+
+patterns: ["**/*"]
+
+rules:
+  # Core Development Principles
+  - Follow intent-based architecture
+  - Maintain type safety
+  - Write self-documenting code
+  - Handle errors gracefully
+  - Test thoroughly
+
+  # Testing Protocol
+  - Run tests after EVERY code change
+  - Analyze test failures systematically:
+    * Identify the specific test case
+    * Review expected vs actual behavior
+    * Check related test cases for patterns
+  - Include test coverage in decision making
+  - Always provide test run button/link after changes
+  - Verify edge cases and boundary conditions
+
+  # Code Review Depth
+  - Examine surrounding context (minimum 10 lines)
+  - Check for patterns across similar files
+  - Consider edge cases explicitly
+  - Review error handling paths
+  - Verify type safety and null checks
+  - Look for potential race conditions
+  - Validate transaction boundaries
+
+  # Error Handling Guidelines
+  - Log meaningful error messages
+  - Include context in error reporting
+  - Consider recovery paths
+  - Maintain transaction integrity
+  - Preserve system state during failures
+  - Use appropriate error types
+  - Implement proper cleanup
+
+  # Documentation Standards
+  - Document WHY, not just WHAT
+  - Explain complex algorithms
+  - Note assumptions and prerequisites
+  - Update relevant documentation
+  - Include examples for non-obvious usage
+  - Keep README current
+  - Document breaking changes
+
+  # Performance Awareness
+  - Consider operation complexity
+  - Note resource-intensive operations
+  - Suggest optimizations when relevant
+  - Monitor transaction boundaries
+  - Be aware of memory usage
+  - Profile critical paths
+  - Consider scalability implications
+
+Getting Started:
+  1. Review existing documentation
+  2. Run test suite before changes
+  3. Make incremental improvements
+  4. Validate changes with tests
+  5. Update documentation as needed
+
+Best Practices:
+  - Use TypeScript strict mode
+  - Follow SOLID principles
+  - Write idiomatic code
+  - Keep functions focused
+  - Maintain separation of concerns
+
+@file src/server.ts
+@file README.md
 ---
 
 Process Guidelines:
@@ -79,18 +152,6 @@ Pull Request Guidelines:
   - Address review comments
   - Squash commits before merge
   - Delete branch after merge
-  - Always open PR in browser window for review
-  - Create PR descriptions using a temporary file:
-    ```
-    # Create description file
-    echo "PR description" > /tmp/pr-description.md
-    # Create PR using file
-    gh pr create --title "title" --body-file /tmp/pr-description.md
-    # Clean up
-    rm /tmp/pr-description.md
-    ```
-
-
 
 Branch Lifecycle:
   - Create branch from main
