@@ -11,12 +11,16 @@ What makes CogniFrame special:
 ## Quick Start
 
 ```bash
-# Create a new project using the starter template
-git clone https://github.com/markng/cogniframe-starter.git my-app
+# Install the framework globally
+npm install -g cogniframe
+
+# Create a new project
+create-cogniframe-app my-app
+
+# Set up your project
 cd my-app
-rm -rf .git
-git init
 npm install
+cp .env.example .env
 npm run dev
 ```
 
@@ -26,51 +30,38 @@ Visit http://localhost:3000 to see your application running!
 
 - Node.js (v16.x or later)
 - npm (v7.x or later)
-- PostgreSQL or MongoDB (optional, if using a database)
+- PostgreSQL or SQLite (optional, if using a database)
 - Basic understanding of TypeScript and web development
 
 ## Creating a New Project
 
-There are two ways to create a new CogniFrame project:
-
-### 1. Using the Starter Template (Recommended for Most Users)
-
-The starter template provides a pre-configured project structure with examples. This is the best choice if you want to:
-- Get started quickly with a working example
-- Learn CogniFrame best practices from example code
-- Have a production-ready project structure
-- Start with common features pre-configured
+The framework provides a simple CLI tool to create new projects:
 
 ```bash
-git clone https://github.com/markng/cogniframe-starter.git my-app
+# Install CogniFrame globally
+npm install -g cogniframe
+
+# Create a new project
+create-cogniframe-app my-app
+
+# Enter the project directory
 cd my-app
-rm -rf .git  # Remove template's git history
-git init     # Start fresh git history
+
+# Install dependencies
 npm install
+
+# Set up environment
+cp .env.example .env
+
+# Start development server
+npm run dev
 ```
 
-### 2. Using the Local Generator (For Advanced Users)
-
-The local generator gives you more control over your project setup. Choose this if you want to:
-- Customize your project structure from scratch
-- Have minimal dependencies
-- Understand the framework internals
-- Contribute to CogniFrame development
-
-```bash
-# Clone the CogniFrame repository
-git clone https://github.com/markng/cogniframe.git
-cd cogniframe
-
-# Install and build the framework
-npm install
-npm run build
-
-# Create and set up your project
-mkdir ../my-app
-cd ../my-app
-node ../cogniframe/dist/core/generator/cli.js
-```
+During project creation, you'll be asked a few questions to customize your setup:
+- Project name and description
+- Database preference (PostgreSQL, SQLite, or none)
+- Features to include
+- Author information
 
 ## Project Setup
 
@@ -86,8 +77,8 @@ node ../cogniframe/dist/core/generator/cli.js
    createdb my_app_db
    npm run migrate:up
 
-   # For MongoDB
-   # Update MONGODB_URI in .env
+   # For SQLite
+   # Update DATABASE_URL in .env
    ```
 
 3. Start development:
