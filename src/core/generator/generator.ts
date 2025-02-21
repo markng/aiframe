@@ -3,6 +3,9 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
 
+const VALID_FEATURES = ['basic', 'auth', 'api'];
+const VALID_NAME_REGEX = /^[a-z0-9-]+$/;
+
 export class AppGenerator {
   private readonly templates = new Map<string, string>();
   private readonly baseDir: string;
@@ -12,11 +15,44 @@ export class AppGenerator {
   }
 
   async generate(options: GeneratorOptions): Promise<GeneratorResult> {
+    // Validate project name
+    if (!VALID_NAME_REGEX.test(options.name)) {
+      throw new Error('Invalid project name. Use only lowercase letters, numbers, and hyphens.');
+    }
+
     const targetDir = options.targetDir || options.name;
     const templateData = this.createTemplateData(options);
     
-    // Create project directory
-    await fs.mkdir(targetDir, { recursive: true });
+    // Check if directory exists and is not empty
+    try {
+      const stats = await fs.stat(targetDir);
+      if (stats.isDirectory()) {
+        const files = await fs.readdir(targetDir);
+        if (files.length > 0) {
+          throw new Error('Directory not empty');
+        }
+      }
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+        throw error;
+      }
+    }
+
+    try {
+      // Create project directory
+      await fs.mkdir(targetDir, { recursive: true });
+    } catch (error) {
+      const err = error as Error;
+      throw new Error(`Failed to create directory: ${err.message}`);
+    }
+
+    // Validate features
+    if (options.features) {
+      const invalidFeatures = options.features.filter(f => !VALID_FEATURES.includes(f));
+      if (invalidFeatures.length > 0) {
+        throw new Error(`Invalid features: ${invalidFeatures.join(', ')}`);
+      }
+    }
 
     // Generate project structure
     const files = await this.generateProjectStructure(targetDir, templateData);
@@ -93,10 +129,19 @@ export class AppGenerator {
     await this.generateReadme(targetDir, data);
     await this.generateMainServer(targetDir, data);
     await this.generateBaseComponent(targetDir);
-    await this.generateBaseTemplate(targetDir);
+    await this.generateBaseTemplates(targetDir, data);
     await this.generateEnvExample(targetDir, data);
     await this.generateJestConfig(targetDir);
     await this.generateCursorRules(targetDir, data);
+
+    // Generate feature-specific files
+    if (data.features?.includes('auth')) {
+      await this.generateAuthFeature(targetDir);
+    }
+
+    if (data.features?.includes('api')) {
+      await this.generateApiFeature(targetDir);
+    }
 
     // Generate database configuration if needed
     if (data.database !== 'none') {
@@ -338,8 +383,11 @@ export class HomeComponent implements ServerComponent {
     await fs.writeFile(join(targetDir, 'src/components/home.component.ts'), content);
   }
 
-  private async generateBaseTemplate(targetDir: string): Promise<void> {
-    const content = `<!DOCTYPE html>
+  private async generateBaseTemplates(targetDir: string, data: TemplateData): Promise<void> {
+    const templatesDir = join(targetDir, 'src/templates');
+
+    // Layout template
+    const layoutTemplate = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -360,7 +408,219 @@ export class HomeComponent implements ServerComponent {
 </body>
 </html>`;
 
-    await fs.writeFile(join(targetDir, 'src/templates/layout.ejs'), content);
+    // Error template
+    const errorTemplate = `<%- include('layout', {
+  title: 'Error',
+  body: \`
+    <div class="error-page">
+      <h1>Error</h1>
+      <p><%= message %></p>
+      <% if (error && process.env.NODE_ENV === 'development') { %>
+        <pre><%= error.stack %></pre>
+      <% } %>
+      <a href="/" class="button">Return Home</a>
+    </div>
+  \`
+}) %>`;
+
+    // Index template
+    const indexTemplate = `<%- include('layout', {
+  title: 'Welcome',
+  body: \`
+    <div class="welcome">
+      <h1>Welcome to <%= name %></h1>
+      <p><%= description %></p>
+    </div>
+  \`
+}) %>`;
+
+    await fs.writeFile(join(templatesDir, 'layout.ejs'), layoutTemplate);
+    await fs.writeFile(join(templatesDir, 'error.ejs'), errorTemplate);
+    await fs.writeFile(join(templatesDir, 'index.ejs'), indexTemplate);
+
+    if (data.features?.includes('auth')) {
+      const loginTemplate = `<%- include('layout', {
+  title: 'Login',
+  body: \`
+    <div class="auth-form">
+      <h1>Login</h1>
+      <form method="POST" action="/auth/login">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  \`
+}) %>`;
+
+      const registerTemplate = `<%- include('layout', {
+  title: 'Register',
+  body: \`
+    <div class="auth-form">
+      <h1>Register</h1>
+      <form method="POST" action="/auth/register">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Register</button>
+      </form>
+    </div>
+  \`
+}) %>`;
+
+      await fs.writeFile(join(templatesDir, 'login.ejs'), loginTemplate);
+      await fs.writeFile(join(templatesDir, 'register.ejs'), registerTemplate);
+    }
+  }
+
+  private async generateAuthFeature(targetDir: string): Promise<void> {
+    const authDir = join(targetDir, 'src/features/auth');
+    await fs.mkdir(authDir, { recursive: true });
+
+    // Auth component
+    const authComponent = `import { ServerComponent, ViewData } from '../../core/types';
+import { Request, Response } from 'express';
+import { authIntent } from './intent';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
+export class AuthComponent implements ServerComponent {
+  intent = authIntent;
+
+  async render(data: ViewData): Promise<string> {
+    return data.template === 'login' ? 
+      await runtime.renderTemplate('login', data) :
+      await runtime.renderTemplate('register', data);
+  }
+
+  async handleAction(req: Request, res: Response): Promise<void> {
+    // Implementation
+  }
+
+  getState(): unknown {
+    return {};
+  }
+}`;
+
+    // Auth intent
+    const authIntent = `import { Intent } from '../../core/types';
+
+export const authIntent: Intent = {
+  name: 'auth',
+  description: 'Authentication and authorization component',
+  capabilities: ['login', 'register', 'logout'],
+  dataStructure: {
+    user: 'User | null'
+  },
+  userActions: [
+    {
+      name: 'login',
+      description: 'Log in to the application',
+      method: 'POST',
+      path: '/auth/login',
+      expectedOutcome: 'User is authenticated'
+    },
+    {
+      name: 'register',
+      description: 'Register a new user account',
+      method: 'POST',
+      path: '/auth/register',
+      expectedOutcome: 'New user account is created'
+    },
+    {
+      name: 'logout',
+      description: 'Log out from the application',
+      method: 'POST',
+      path: '/auth/logout',
+      expectedOutcome: 'User is logged out'
+    }
+  ]
+};`;
+
+    await fs.writeFile(join(authDir, 'component.ts'), authComponent);
+    await fs.writeFile(join(authDir, 'intent.ts'), authIntent);
+  }
+
+  private async generateApiFeature(targetDir: string): Promise<void> {
+    const apiDir = join(targetDir, 'src/features/api');
+    await fs.mkdir(apiDir, { recursive: true });
+
+    // API component
+    const apiComponent = `import { ServerComponent, ViewData } from '../../core/types';
+import { Request, Response } from 'express';
+import { apiIntent } from './intent';
+
+export class ApiComponent implements ServerComponent {
+  intent = apiIntent;
+
+  async render(data: ViewData): Promise<string> {
+    return '';  // API endpoints don't render HTML
+  }
+
+  async handleAction(req: Request, res: Response): Promise<void> {
+    // Implementation
+  }
+
+  getState(): unknown {
+    return {};
+  }
+}`;
+
+    // API intent
+    const apiIntent = `import { Intent } from '../../core/types';
+
+export const apiIntent: Intent = {
+  name: 'api',
+  description: 'RESTful API endpoints',
+  capabilities: ['crud'],
+  dataStructure: {},
+  userActions: [
+    {
+      name: 'create',
+      description: 'Create a new resource',
+      method: 'POST',
+      path: '/api/:resource',
+      expectedOutcome: 'New resource is created'
+    },
+    {
+      name: 'read',
+      description: 'Read a resource',
+      method: 'GET',
+      path: '/api/:resource/:id',
+      expectedOutcome: 'Resource data is returned'
+    },
+    {
+      name: 'update',
+      description: 'Update a resource',
+      method: 'PUT',
+      path: '/api/:resource/:id',
+      expectedOutcome: 'Resource is updated'
+    },
+    {
+      name: 'delete',
+      description: 'Delete a resource',
+      method: 'DELETE',
+      path: '/api/:resource/:id',
+      expectedOutcome: 'Resource is deleted'
+    }
+  ]
+};`;
+
+    await fs.writeFile(join(apiDir, 'component.ts'), apiComponent);
+    await fs.writeFile(join(apiDir, 'intent.ts'), apiIntent);
   }
 
   private async generateEnvExample(targetDir: string, data: TemplateData): Promise<void> {
@@ -438,8 +698,17 @@ export const dbConfig = {
     if (data.database === 'postgres') {
       deps['pg'] = '^8.13.3';
     } else if (data.database === 'sqlite') {
-      deps['@types/better-sqlite3'] = '^7.6.9';
-      deps['better-sqlite3'] = '^9.4.3';
+      deps['sqlite3'] = '^5.1.7';
+    }
+
+    if (data.features?.includes('auth')) {
+      deps['bcrypt'] = '^5.1.1';
+      deps['jsonwebtoken'] = '^9.0.2';
+    }
+
+    if (data.features?.includes('api')) {
+      deps['cors'] = '^2.8.5';
+      deps['helmet'] = '^7.1.0';
     }
 
     return deps;
@@ -456,14 +725,23 @@ export const dbConfig = {
       '@types/node': '^20.0.0',
       'jest': '^29.5.0',
       'ts-jest': '^29.1.0',
-      'typescript': '^5.0.0',
-      'ts-node-dev': '^2.0.0'
+      'ts-node-dev': '^2.0.0',
+      'typescript': '^5.0.0'
     };
 
     if (data.database === 'postgres') {
       deps['@types/pg'] = '^8.11.11';
     } else if (data.database === 'sqlite') {
-      deps['@types/better-sqlite3'] = '^7.6.9';
+      deps['@types/sqlite3'] = '^3.1.11';
+    }
+
+    if (data.features?.includes('auth')) {
+      deps['@types/bcrypt'] = '^5.0.2';
+      deps['@types/jsonwebtoken'] = '^9.0.5';
+    }
+
+    if (data.features?.includes('api')) {
+      deps['@types/cors'] = '^2.8.17';
     }
 
     return deps;
