@@ -2,16 +2,58 @@
   title: title,
   body: `
     <div class="aiframe-welcome">
-      <h1>Welcome to AIFrame</h1>
-      <p class="version">v${state.frameworkVersion} (${state.environment})</p>
-      
+      <div class="hero">
+        <div class="hero-content">
+          <h1>Welcome to AIFrame</h1>
+          <p class="tagline">A server-side web framework optimized for AI-human collaboration</p>
+          <div class="version-badge">
+            <span class="version">v${state.frameworkVersion}</span>
+            <span class="env">${state.environment}</span>
+          </div>
+          <div class="hero-actions">
+            <a href="/docs" class="button primary">Documentation</a>
+            <a href="https://github.com/yourusername/aiframe" class="button secondary">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Intent-Driven</h3>
+          <p>Components declare their purpose and capabilities explicitly</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Type-Safe</h3>
+          <p>Built with TypeScript for robust development</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3>AI-First</h3>
+          <p>Designed for seamless AI-human collaboration</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🧩</div>
+          <h3>Composable</h3>
+          <p>Build complex apps from simple components</p>
+        </div>
+      </div>
+
       <div class="quick-start">
         <h2>Quick Start</h2>
-        <p>Create your first component by adding these files:</p>
+        <p>Create your first component in three easy steps:</p>
         
-        <div class="code-example">
-          <h3>src/features/hello/intent.ts</h3>
-          <pre><code>import { Intent } from '../../core/types';
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <h3>Define Intent</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <span>src/features/hello/intent.ts</span>
+                <button class="copy-button" data-code="intent">Copy</button>
+              </div>
+              <pre><code>import { Intent } from '../../core/types';
 
 export const helloIntent: Intent = {
   name: 'hello',
@@ -30,9 +72,18 @@ export const helloIntent: Intent = {
     }
   ]
 };</code></pre>
+            </div>
+          </div>
 
-          <h3>src/features/hello/component.ts</h3>
-          <pre><code>import { ServerComponent, ViewData } from '../../core/types';
+          <div class="step">
+            <div class="step-number">2</div>
+            <h3>Implement Component</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <span>src/features/hello/component.ts</span>
+                <button class="copy-button" data-code="component">Copy</button>
+              </div>
+              <pre><code>import { ServerComponent, ViewData } from '../../core/types';
 import { helloIntent } from './intent';
 
 export class HelloComponent implements ServerComponent {
@@ -55,14 +106,24 @@ export class HelloComponent implements ServerComponent {
     return this.state;
   }
 }</code></pre>
-        </div>
+            </div>
+          </div>
 
-        <h2>Register Your Component</h2>
-        <p>Add this to your server.ts:</p>
-        <pre><code>import { HelloComponent } from './features/hello/component';
+          <div class="step">
+            <div class="step-number">3</div>
+            <h3>Register Component</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <span>src/server.ts</span>
+                <button class="copy-button" data-code="register">Copy</button>
+              </div>
+              <pre><code>import { HelloComponent } from './features/hello/component';
 
 const hello = new HelloComponent();
 runtime.registerComponent('hello', hello);</code></pre>
+            </div>
+          </div>
+        </div>
       </div>
 
       ${Array.from(state.registeredComponents.entries())
@@ -75,12 +136,21 @@ runtime.registerComponent('hello', hello);</code></pre>
               .filter(([name]) => !name.startsWith('system:'))
               .map(([name, component]) => `
                 <div class="component-card">
-                  <h3>${component.intent.name}</h3>
-                  <p>${component.intent.description}</p>
+                  <div class="component-header">
+                    <h3>${component.intent.name}</h3>
+                    <div class="component-meta">
+                      ${component.intent.capabilities.length} capabilities
+                    </div>
+                  </div>
+                  <p class="component-description">${component.intent.description}</p>
                   <div class="capabilities">
                     ${component.intent.capabilities.map(cap => 
                       `<span class="capability">${cap}</span>`
                     ).join('')}
+                  </div>
+                  <div class="component-actions">
+                    <button class="view-intent">View Intent</button>
+                    <button class="view-state">View State</button>
                   </div>
                 </div>
               `).join('')}
@@ -88,70 +158,310 @@ runtime.registerComponent('hello', hello);</code></pre>
         </div>
       ` : ''}
 
+      <div class="environment-info">
+        <h2>Environment</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <strong>Framework Version:</strong>
+            <span>${state.frameworkVersion}</span>
+          </div>
+          <div class="info-item">
+            <strong>Environment:</strong>
+            <span>${state.environment}</span>
+          </div>
+          <div class="info-item">
+            <strong>Components:</strong>
+            <span>${state.registeredComponents.size}</span>
+          </div>
+          <div class="info-item">
+            <strong>Node Version:</strong>
+            <span>${process.version}</span>
+          </div>
+        </div>
+      </div>
+
       <style>
         .aiframe-welcome {
-          padding: 2rem;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0;
         }
         
-        .version {
-          color: #666;
-          font-size: 0.9rem;
+        .hero {
+          background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+          color: white;
+          padding: 4rem 2rem;
+          text-align: center;
+          border-radius: 0 0 2rem 2rem;
+          margin-bottom: 3rem;
         }
         
-        .quick-start {
-          margin: 2rem 0;
-          padding: 1rem;
-          background: #f8f9fa;
-          border-radius: 8px;
+        .hero h1 {
+          font-size: 3rem;
+          margin: 0;
+          font-weight: 700;
         }
         
-        .code-example {
-          background: #fff;
-          padding: 1rem;
-          border-radius: 4px;
+        .tagline {
+          font-size: 1.2rem;
+          opacity: 0.9;
           margin: 1rem 0;
         }
         
+        .version-badge {
+          display: inline-flex;
+          align-items: center;
+          background: rgba(255,255,255,0.1);
+          padding: 0.5rem 1rem;
+          border-radius: 2rem;
+          margin: 1rem 0;
+        }
+        
+        .version {
+          font-weight: 600;
+          margin-right: 0.5rem;
+        }
+        
+        .env {
+          font-size: 0.8rem;
+          opacity: 0.8;
+        }
+        
+        .hero-actions {
+          margin-top: 2rem;
+        }
+        
+        .button {
+          display: inline-block;
+          padding: 0.8rem 1.6rem;
+          border-radius: 2rem;
+          text-decoration: none;
+          font-weight: 500;
+          margin: 0 0.5rem;
+          transition: all 0.2s;
+        }
+        
+        .button.primary {
+          background: #E74C3C;
+          color: white;
+        }
+        
+        .button.secondary {
+          background: rgba(255,255,255,0.1);
+          color: white;
+        }
+        
+        .features-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 2rem;
+          padding: 2rem;
+          margin-bottom: 3rem;
+        }
+        
+        .feature-card {
+          background: white;
+          padding: 2rem;
+          border-radius: 1rem;
+          text-align: center;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .feature-icon {
+          font-size: 2.5rem;
+          margin-bottom: 1rem;
+        }
+        
+        .quick-start {
+          background: #F8F9FA;
+          padding: 3rem 2rem;
+          border-radius: 1rem;
+          margin-bottom: 3rem;
+        }
+        
+        .steps {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 2rem;
+          margin-top: 2rem;
+        }
+        
+        .step {
+          position: relative;
+        }
+        
+        .step-number {
+          width: 2rem;
+          height: 2rem;
+          background: #E74C3C;
+          color: white;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 600;
+          margin-bottom: 1rem;
+        }
+        
+        .code-block {
+          background: #282C34;
+          border-radius: 0.5rem;
+          overflow: hidden;
+          margin-top: 1rem;
+        }
+        
+        .code-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.5rem 1rem;
+          background: rgba(255,255,255,0.1);
+          color: white;
+        }
+        
+        .copy-button {
+          background: rgba(255,255,255,0.2);
+          border: none;
+          color: white;
+          padding: 0.25rem 0.5rem;
+          border-radius: 0.25rem;
+          cursor: pointer;
+          font-size: 0.8rem;
+        }
+        
         pre {
-          background: #282c34;
-          color: #abb2bf;
+          margin: 0;
           padding: 1rem;
-          border-radius: 4px;
           overflow-x: auto;
         }
         
         code {
-          font-family: 'Monaco', 'Menlo', monospace;
+          font-family: 'Fira Code', monospace;
           font-size: 0.9rem;
+          color: #ABB2BF;
         }
         
         .components-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-          gap: 1rem;
-          margin-top: 1rem;
+          gap: 1.5rem;
+          margin-top: 2rem;
         }
         
         .component-card {
-          background: #fff;
-          padding: 1rem;
-          border-radius: 8px;
+          background: white;
+          border-radius: 1rem;
+          padding: 1.5rem;
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
+        .component-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+        }
+        
+        .component-meta {
+          font-size: 0.8rem;
+          color: #6C757D;
+        }
+        
+        .component-description {
+          color: #495057;
+          margin-bottom: 1rem;
+        }
+        
         .capabilities {
-          margin-top: 0.5rem;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-bottom: 1rem;
         }
         
         .capability {
-          display: inline-block;
-          padding: 0.25rem 0.5rem;
-          background: #e9ecef;
-          border-radius: 4px;
-          margin: 0.25rem;
+          background: #E9ECEF;
+          color: #495057;
+          padding: 0.25rem 0.75rem;
+          border-radius: 1rem;
           font-size: 0.8rem;
         }
+        
+        .component-actions {
+          display: flex;
+          gap: 0.5rem;
+        }
+        
+        .component-actions button {
+          background: #F8F9FA;
+          border: none;
+          padding: 0.5rem 1rem;
+          border-radius: 0.5rem;
+          cursor: pointer;
+          font-size: 0.9rem;
+          color: #495057;
+        }
+        
+        .environment-info {
+          background: white;
+          padding: 2rem;
+          border-radius: 1rem;
+          margin-bottom: 3rem;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .info-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1.5rem;
+          margin-top: 1.5rem;
+        }
+        
+        .info-item {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        
+        .info-item strong {
+          color: #6C757D;
+          font-size: 0.9rem;
+        }
+        
+        .info-item span {
+          font-size: 1.1rem;
+          color: #212529;
+        }
       </style>
+
+      <script>
+        // Add copy functionality
+        document.querySelectorAll('.copy-button').forEach(button => {
+          button.addEventListener('click', () => {
+            const code = button.closest('.code-block').querySelector('code').textContent;
+            navigator.clipboard.writeText(code);
+            button.textContent = 'Copied!';
+            setTimeout(() => {
+              button.textContent = 'Copy';
+            }, 2000);
+          });
+        });
+
+        // Add component action handlers
+        document.querySelectorAll('.view-intent').forEach(button => {
+          button.addEventListener('click', () => {
+            const card = button.closest('.component-card');
+            // TODO: Show intent details in a modal
+          });
+        });
+
+        document.querySelectorAll('.view-state').forEach(button => {
+          button.addEventListener('click', () => {
+            const card = button.closest('.component-card');
+            // TODO: Show current state in a modal
+          });
+        });
+      </script>
     </div>
   `
 }) %> 
