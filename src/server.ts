@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
-import csrf from 'csurf';
+import { doubleCsrf } from 'csrf-csrf';
 import path from 'path';
 import { Runtime } from './core/runtime';
 import { ViewData } from './core/types';
@@ -36,7 +36,17 @@ app.use(session({
   saveUninitialized: false,
   cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
-app.use(csrf({ cookie: true }));
+
+const { generateToken, doubleCsrfProtection } = doubleCsrf({
+  getSecret: () => process.env.SESSION_SECRET || 'development-secret',
+  cookieName: 'csrf-token',
+  cookieOptions: {
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  }
+});
+
+app.use(doubleCsrfProtection);
 
 // Set up EJS as view engine
 app.set('view engine', 'ejs');
@@ -55,7 +65,7 @@ app.get('/', async (req: Request, res: Response) => {
   const viewData: ViewData = {
     title: 'AIFrame',
     state: indexComponent.getState(),
-    csrfToken: req.csrfToken(),
+    csrfToken: generateToken(req, res),
     flash: req.session.flash
   };
   
@@ -72,7 +82,7 @@ app.use(async (err: Error, req: Request, res: Response, next: NextFunction) => {
     const html = await runtime.renderTemplate('error', {
       title: 'Unauthorized',
       message: 'You are not authorized to view this page',
-      csrfToken: req.csrfToken(),
+      csrfToken: generateToken(req, res),
       state: null
     });
     res.status(401).send(html);
@@ -87,7 +97,7 @@ app.use(async (err: Error, req: Request, res: Response, next: NextFunction) => {
   const html = await runtime.renderTemplate('error', {
     title: 'Error',
     message: 'Something went wrong!',
-    csrfToken: req.csrfToken(),
+    csrfToken: generateToken(req, res),
     state: null
   });
   res.status(500).send(html);
