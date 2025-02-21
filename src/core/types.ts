@@ -52,11 +52,43 @@ export interface ViewData {
   message?: string;
 }
 
+export interface PersistenceAdapter<T = unknown> {
+  save(key: string, data: T): Promise<void>;
+  load(key: string): Promise<T | null>;
+  delete(key: string): Promise<void>;
+  query(filter: unknown): Promise<T[]>;
+}
+
+export interface EventStore {
+  append(streamId: string, events: StateEvent[]): Promise<void>;
+  read(streamId: string, fromVersion?: number): Promise<StateEvent[]>;
+  getSnapshot(streamId: string): Promise<StateSnapshot | null>;
+  saveSnapshot(streamId: string, snapshot: StateSnapshot): Promise<void>;
+}
+
+export interface StateEvent {
+  type: string;
+  data: unknown;
+  metadata: {
+    timestamp: number;
+    version: number;
+    userId?: string;
+  };
+}
+
+export interface StateSnapshot {
+  state: unknown;
+  version: number;
+  timestamp: number;
+}
+
 export interface ServerComponent {
   intent: Intent;
   render: (data: ViewData) => Promise<string>;
   handleAction: (req: Request, res: Response) => Promise<void>;
   getState: () => unknown;
+  persistState?: () => Promise<void>;
+  loadState?: () => Promise<void>;
 }
 
 export interface Route {
