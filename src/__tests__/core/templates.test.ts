@@ -128,6 +128,32 @@ describe('TemplateEngine', () => {
       });
       expect(html).toBe('<div>platform</div>');
     });
+
+    it('should prevent path traversal with normalized paths', async () => {
+      // Create a file outside templates directory
+      await fs.writeFile(
+        join(tempDir, 'malicious.ejs'),
+        'malicious content'
+      );
+
+      // Create a symlink that points outside templates directory
+      const symlinkPath = join(tempDir, 'templates', 'symlink.ejs');
+      await fs.symlink(join(tempDir, 'malicious.ejs'), symlinkPath);
+
+      const viewData = {
+        title: '',
+        state: {},
+        csrfToken: ''
+      };
+
+      // Try to access file through symlink
+      await expect(engine.render('symlink', viewData))
+        .rejects
+        .toThrow('Invalid template path: attempted path traversal');
+
+      // Clean up symlink
+      await fs.unlink(symlinkPath);
+    });
   });
 
   describe('Template Loading Edge Cases', () => {

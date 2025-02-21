@@ -20,7 +20,7 @@ describe('IndexComponent', () => {
   });
 
   beforeEach(() => {
-    runtime = new Runtime(join(__dirname, '../../templates'));
+    runtime = new Runtime(join(__dirname, '../../../templates'));
     component = new IndexComponent(runtime);
     testComponent = new TestComponent();
   });
