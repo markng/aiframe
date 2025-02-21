@@ -32,6 +32,27 @@ describe('PostgresAdapter', () => {
     }
   });
 
+  afterAll(async () => {
+    if (adapter) {
+      try {
+        // Drop the test table using raw pool query
+        const pool = adapter['pool'];
+        if (pool) {
+          await pool.query(`DROP TABLE IF EXISTS ${adapter['schema']}.${adapter['table']}`);
+        }
+        
+        // Then disconnect and cleanup
+        await adapter.disconnect();
+        
+        // Add a small delay to ensure all resources are cleaned up
+        await new Promise(resolve => setTimeout(resolve, 100));
+      } catch (error) {
+        console.error('Failed to cleanup after tests:', error);
+        throw error;
+      }
+    }
+  });
+
   describe('Basic CRUD Operations', () => {
     it('should save and load data', async () => {
       const testData = { name: 'test', value: 123 };
@@ -124,7 +145,11 @@ describe('PostgresAdapter', () => {
 
   it('should handle missing optional configuration', async () => {
     const minimalConfig: PostgresAdapterConfig = {
+      host: process.env.POSTGRES_HOST || 'localhost',
+      port: parseInt(process.env.POSTGRES_PORT || '5432'),
       database: process.env.POSTGRES_DB || 'test_db',
+      user: process.env.POSTGRES_USER || 'postgres',
+      password: process.env.POSTGRES_PASSWORD || 'postgres',
       table: 'test_table'
     };
     

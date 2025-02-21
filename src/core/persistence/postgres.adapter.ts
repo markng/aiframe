@@ -9,7 +9,7 @@ export interface PostgresAdapterConfig extends PoolConfig {
 }
 
 export class PostgresAdapter<T = unknown> implements PersistenceAdapter<T> {
-  private pool: Pool;
+  private pool?: Pool;
   private readonly table: string;
   private readonly keyColumn: string;
   private readonly dataColumn: string;
@@ -27,10 +27,17 @@ export class PostgresAdapter<T = unknown> implements PersistenceAdapter<T> {
     this.pool = new Pool(poolConfig);
   }
 
+  private ensurePool(): Pool {
+    if (!this.pool) {
+      throw new Error('Database pool is not initialized');
+    }
+    return this.pool;
+  }
+
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    const client = await this.pool.connect();
+    const client = await this.ensurePool().connect();
     try {
       // Create schema if it doesn't exist
       await client.query(`
@@ -83,10 +90,17 @@ export class PostgresAdapter<T = unknown> implements PersistenceAdapter<T> {
       INSERT INTO ${this.schema}.${this.table} (${this.keyColumn}, ${this.dataColumn})
       VALUES ($1, $2)
       ON CONFLICT (${this.keyColumn})
-      DO UPDATE SET ${this.dataColumn} = $2, updated_at = CURRENT_TIMESTAMP;
+      DO UPDATE SET
+        ${this.dataColumn} = $2,
+        updated_at = CURRENT_TIMESTAMP;
     `;
 
-    await (client || this.pool).query(query, [key, JSON.stringify(data)]);
+    // If we're in a transaction, we must use the transaction's client
+    if (client && !('options' in client)) {
+      await client.query(query, [key, data]);
+    } else {
+      await this.ensurePool().query(query, [key, data]);
+    }
   }
 
   async load(key: string, client?: Pool | PoolClient): Promise<T | null> {
@@ -98,10 +112,15 @@ export class PostgresAdapter<T = unknown> implements PersistenceAdapter<T> {
       WHERE ${this.keyColumn} = $1;
     `;
 
-    const result = await (client || this.pool).query(query, [key]);
-    if (result.rows.length === 0) return null;
+    // If we're in a transaction, we must use the transaction's client
+    let result;
+    if (client && !('options' in client)) {
+      result = await client.query(query, [key]);
+    } else {
+      result = await this.ensurePool().query(query, [key]);
+    }
 
-    return result.rows[0][this.dataColumn];
+    return result.rows.length > 0 ? result.rows[0][this.dataColumn] : null;
   }
 
   async delete(key: string, client?: Pool | PoolClient): Promise<void> {
@@ -112,11 +131,21 @@ export class PostgresAdapter<T = unknown> implements PersistenceAdapter<T> {
       WHERE ${this.keyColumn} = $1;
     `;
 
-    await (client || this.pool).query(query, [key]);
+    // If we're in a transaction, we must use the transaction's client
+    if (client && !('options' in client)) {
+      await client.query(query, [key]);
+    } else {
+      await this.ensurePool().query(query, [key]);
+    }
   }
 
   async query(filter: unknown, client?: Pool | PoolClient): Promise<T[]> {
     await this.initialize();
+
+    // Return empty array for invalid filters
+    if (filter === null || typeof filter !== 'object' || Array.isArray(filter)) {
+      return [];
+    }
 
     // Convert filter to PostgreSQL JSONB query
     const conditions = this.buildJsonbConditions(filter);
@@ -127,13 +156,84 @@ export class PostgresAdapter<T = unknown> implements PersistenceAdapter<T> {
       WHERE ${conditions.query};
     `;
 
-    const result = await (client || this.pool).query(query, conditions.params);
+    // If we're in a transaction, we must use the transaction's client
+    let result;
+    if (client && !('options' in client)) {
+      result = await client.query(query, conditions.params);
+    } else {
+      result = await this.ensurePool().query(query, conditions.params);
+    }
+
     return result.rows.map(row => row[this.dataColumn]);
   }
 
+  async disconnect(): Promise<void> {
+    if (!this.pool) return;
+    
+    try {
+      // Wait for any in-progress operations to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // End the pool
+      await this.pool.end();
+      
+      // Reset state
+      this.isInitialized = false;
+      delete this.pool;
+    } catch (error) {
+      console.error('Error during disconnect:', error);
+      throw error;
+    }
+  }
+
+  async withTransaction<R>(
+    callback: (client: PoolClient) => Promise<R>
+  ): Promise<R> {
+    const client = await this.ensurePool().connect();
+    try {
+      console.log('Starting transaction');
+      await client.query('BEGIN');
+      await client.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+      
+      // Wait for any in-progress transactions to complete
+      await client.query('SELECT pg_sleep(0.1)');
+      
+      const result = await callback(client);
+      console.log('Transaction successful, committing');
+      await client.query('COMMIT');
+      return result;
+    } catch (error) {
+      console.log('Transaction failed, rolling back', error);
+      try {
+        console.log('Executing ROLLBACK');
+        const rollbackResult = await client.query('ROLLBACK');
+        console.log('ROLLBACK result:', rollbackResult);
+        
+        // Add a small delay to ensure rollback completes
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Clean up any lingering data
+        console.log('Cleaning up transaction data');
+        await client.query('DISCARD ALL');
+        
+        console.log('Executing DEALLOCATE ALL');
+        const deallocateResult = await client.query('DEALLOCATE ALL');
+        console.log('DEALLOCATE ALL result:', deallocateResult);
+      } catch (rollbackError) {
+        // If rollback fails, we still want to release the client and throw the original error
+        console.error('Failed to rollback transaction:', rollbackError);
+      }
+      throw error;
+    } finally {
+      console.log('Releasing client');
+      client.release();
+    }
+  }
+
   private buildJsonbConditions(filter: unknown): { query: string; params: unknown[] } {
-    if (!filter || typeof filter !== 'object') {
-      return { query: '1=1', params: [] };
+    if (!filter || typeof filter !== 'object' || Array.isArray(filter)) {
+      // Return a condition that matches nothing
+      return { query: '1=0', params: [] };
     }
 
     const conditions: string[] = [];
@@ -147,30 +247,8 @@ export class PostgresAdapter<T = unknown> implements PersistenceAdapter<T> {
     }
 
     return {
-      query: conditions.length ? conditions.join(' AND ') : '1=1',
+      query: conditions.length > 0 ? conditions.join(' AND ') : '1=1',
       params
     };
-  }
-
-  async disconnect(): Promise<void> {
-    await this.pool.end();
-  }
-
-  // Transaction support
-  async withTransaction<R>(
-    callback: (client: PoolClient) => Promise<R>
-  ): Promise<R> {
-    const client = await this.pool.connect();
-    try {
-      await client.query('BEGIN');
-      const result = await callback(client);
-      await client.query('COMMIT');
-      return result;
-    } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-    } finally {
-      client.release();
-    }
   }
 } 
