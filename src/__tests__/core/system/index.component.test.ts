@@ -15,11 +15,12 @@ describe('IndexComponent', () => {
   beforeAll(() => {
     originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'development';
-    // Read package version once for all tests
-    const packageJson = JSON.parse(
-      readFileSync(join(__dirname, '../../../../package.json'), 'utf-8')
-    );
+    // Read package version using absolute path
+    const packagePath = join(process.cwd(), 'package.json');
+    console.log('Reading package.json from:', packagePath);
+    const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'));
     packageVersion = packageJson.version;
+    console.log('Package version:', packageVersion);
   });
 
   afterAll(() => {
@@ -29,6 +30,7 @@ describe('IndexComponent', () => {
   beforeEach(() => {
     // Use absolute path for templates
     const templatesDir = join(process.cwd(), 'src/templates');
+    console.log('Using templates from:', templatesDir);
     runtime = new Runtime(templatesDir);
     component = new IndexComponent(runtime);
     testComponent = new TestComponent();
