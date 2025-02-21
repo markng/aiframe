@@ -73,7 +73,8 @@
   "overrides": {
     "sqlite3": {
       "node-gyp": "^11.1.0"
-    }
+    },
+    "@npmcli/move-file": "@npmcli/fs@^3.1.0"
   },
   "jest": {
     "preset": "ts-jest",
