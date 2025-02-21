@@ -1,1 +1,63 @@
- 
+description: AIFrame Framework Implementation Insights
+Key learnings and best practices from framework development.
+
+patterns: ["src/**/*.ts"]
+
+rules:
+  - Document all non-obvious implementation decisions
+  - Share insights through detailed comments
+  - Explain trade-offs and alternatives
+  - Keep track of edge cases discovered
+  - Document performance considerations
+  - Note security implications
+  - Share AI collaboration insights
+
+Key Learnings:
+  - Type System:
+    - Use discriminated unions for state transitions
+    - Leverage TypeScript's inference capabilities
+    - Create reusable type utilities
+    - Document type constraints
+    - Use generics judiciously
+
+  - Error Handling:
+    - Create domain-specific error types
+    - Use error factories for consistency
+    - Include stack traces in development
+    - Sanitize errors for production
+    - Log errors with context
+
+  - State Management:
+    - Keep component state immutable
+    - Use events for state changes
+    - Implement snapshots for performance
+    - Consider eventual consistency
+    - Handle concurrent modifications
+
+  - Testing:
+    - Test both success and failure paths
+    - Create test utilities for common patterns
+    - Mock external dependencies consistently
+    - Test edge cases explicitly
+    - Document test scenarios
+
+Areas for Improvement:
+  - Add runtime type checking
+  - Improve error messages
+  - Add performance monitoring
+  - Enhance developer tools
+  - Create migration utilities
+  - Add schema validation
+  - Implement hot reloading
+
+Security Considerations:
+  - Validate all inputs
+  - Escape template output
+  - Use CSRF protection
+  - Implement rate limiting
+  - Add audit logging
+  - Secure session handling
+
+@file src/core/types.ts
+@file src/core/runtime.ts
+@file src/core/persistence/types.ts 
