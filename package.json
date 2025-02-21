@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "jest --coverage --coverageReporters='text-summary'",
+    "test": "jest --config=package.json --coverage --coverageReporters='text-summary'",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "start": "node dist/server.js",
     "migrate": "ts-node src/core/persistence/migrations/cli.ts",
