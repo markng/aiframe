@@ -491,231 +491,106 @@ export async function connect() {
   }
 
   private async generateCursorRules(targetDir: string, data: TemplateData): Promise<void> {
-    // Framework Rule
-    const frameworkRule = `description: AIFrame Framework Overview
-This is a server-side web framework optimized for AI-human collaboration.
+    // Framework Usage Rule
+    const frameworkRule = `description: AIFrame Application Guidelines
+A guide to building applications with AIFrame.
 
 patterns: ["**/*.ts", "**/*.tsx"]
 
 rules:
-  - Framework follows a component-based architecture with intent-driven design
-  - Each component must have an intent file describing its purpose and capabilities
-  - Components are server-side rendered using EJS templates
-  - All code must be TypeScript with strict type checking
+  - Follow the component-based architecture
+  - Create intent files for all components
+  - Use TypeScript with strict mode
+  - Handle errors gracefully
+  - Document component purposes
+  - Write comprehensive tests
 
-@file src/core/types.ts
+Getting Started:
+  - Create components in src/components/
+  - Define intents in src/features/
+  - Add templates in src/templates/
+  - Write tests in tests/
+
+@file src/server.ts
 @file README.md`;
 
     // Components Rule
-    const componentsRule = `description: AIFrame Component Guidelines
-Rules for creating and modifying components in AIFrame.
+    const componentsRule = `description: AIFrame Component Development
+Guidelines for creating and modifying application components.
 
 patterns: ["src/components/**/*.ts", "src/features/**/*.ts"]
 
 rules:
-  - Each component must implement the ServerComponent interface
-  - Every component needs an associated intent file
-  - Component state should be immutable
+  - Implement ServerComponent interface
+  - Create intent file for each component
+  - Keep component state immutable
   - Handle all errors gracefully
-  - Include proper type definitions
-  - Follow naming convention: [Name]Component.ts and [name].intent.ts
+  - Use proper type definitions
+  - Follow naming conventions
 
 Component Structure:
-  - intent: Describes component purpose and capabilities
+  - intent: Describes purpose and capabilities
   - render: Returns HTML string
   - handleAction: Processes user actions
   - getState: Returns current state
 
-@file src/components/home.component.ts
-@file src/core/types.ts`;
+@file src/components/home.component.ts`;
 
     // Database Rule
-    const databaseRule = `description: AIFrame Database Guidelines
-Rules for database operations and migrations.
+    const databaseRule = `description: AIFrame Database Usage
+Guidelines for database operations in your application.
 
 patterns: ["src/core/persistence/**/*.ts", "migrations/**/*.ts"]
 
 rules:
-  - Use provided adapter interfaces for database operations
-  - Always handle database errors and connection issues
+  - Use provided adapter interfaces
+  - Handle database errors properly
   - Use migrations for schema changes
   - Include rollback functionality
-  - Use transactions for multi-step operations
-  - Never expose database errors to users
+  - Use transactions when needed
+  - Keep database logic isolated
 
 @file src/core/persistence/types.ts
 ${data.database === 'postgres' ? '@file src/core/persistence/postgres.adapter.ts' : ''}
 ${data.database === 'mongodb' ? '@file src/core/persistence/mongo.adapter.ts' : ''}`;
 
     // Templates Rule
-    const templatesRule = `description: AIFrame Template Guidelines
-Rules for working with EJS templates.
+    const templatesRule = `description: AIFrame Template Development
+Guidelines for working with templates in your application.
 
 patterns: ["src/templates/**/*.ejs"]
 
 rules:
-  - Use layout.ejs as the base template
-  - Always escape user-generated content
+  - Extend the base layout template
+  - Escape all user-generated content
   - Include CSRF tokens in forms
-  - Keep logic in components, not templates
-  - Use proper HTML5 structure
-  - Follow accessibility guidelines
+  - Keep logic in components
+  - Follow HTML5 standards
+  - Maintain accessibility
 
 @file src/templates/layout.ejs`;
 
     // Testing Rule
     const testingRule = `description: AIFrame Testing Guidelines
-Rules for writing and maintaining tests.
+Rules for testing your application.
 
 patterns: ["tests/**/*.test.ts", "**/*.test.ts"]
 
 rules:
-  - Write tests for all components
-  - Test both success and error cases
+  - Test all components
+  - Cover success and error cases
   - Mock external dependencies
-  - Use provided test utilities
-  - Follow AAA pattern (Arrange, Act, Assert)
+  - Use test utilities
+  - Follow AAA pattern
   - Test intent implementations
 
-@file src/__tests__/setup.ts
+@file tests/setup.ts
 @file jest.config.js`;
-
-    // Development Philosophy Rule
-    const philosophyRule = `description: AIFrame Development Philosophy
-A guide to understanding the core principles and decisions behind AIFrame.
-
-patterns: ["**/*"]
-
-rules:
-  - Framework is designed for AI-human collaboration first
-  - Prefer explicit interfaces over implicit conventions
-  - Use TypeScript's type system to guide implementation
-  - Balance flexibility with type safety
-  - Make component intentions clear through metadata
-  - Keep the core simple, extend through adapters
-  - Design for testability from the start
-
-Key Decisions:
-  - Server-side rendering for simplicity and SEO
-  - Intent-based components for clear purpose
-  - Adapter pattern for database flexibility
-  - Event sourcing support for state tracking
-  - Migration system for schema evolution
-
-Future Directions:
-  - Client-side hydration
-  - Component composition
-  - Plugin system
-  - GraphQL support
-  - Real-time capabilities
-
-@file src/core/types.ts
-@file src/core/runtime.ts`;
-
-    // Design Patterns Rule
-    const patternsRule = `description: AIFrame Design Patterns
-Common patterns and best practices discovered during framework development.
-
-patterns: ["src/**/*.ts"]
-
-rules:
-  - Use factory pattern for creating adapters
-  - Implement interfaces for extensibility
-  - Keep component state immutable
-  - Use events for state changes
-  - Separate intent from implementation
-  - Make dependencies explicit
-  - Use composition over inheritance
-
-Component Patterns:
-  - Split complex components into features
-  - Use intent files for documentation
-  - Handle all edge cases explicitly
-  - Validate state transitions
-  - Keep render logic simple
-
-Database Patterns:
-  - Abstract storage operations
-  - Use transactions for consistency
-  - Implement retry mechanisms
-  - Handle connection failures
-  - Version all schemas
-
-@file src/core/persistence/factory.ts
-@file src/core/persistence/postgres.adapter.ts`;
-
-    // Implementation Insights Rule
-    const insightsRule = `description: AIFrame Implementation Insights
-Key learnings and insights from implementing the framework.
-
-patterns: ["src/**/*.ts"]
-
-rules:
-  - Start with interfaces before implementation
-  - Use union types for better type safety
-  - Keep core interfaces small and focused
-  - Document edge cases in tests
-  - Use builder pattern for complex objects
-  - Implement graceful fallbacks
-  - Consider error handling early
-
-Key Learnings:
-  - Type safety helps catch errors early
-  - Clear interfaces make extension easier
-  - Event sourcing simplifies debugging
-  - Migration system is essential
-  - Factory pattern provides flexibility
-
-Areas for Improvement:
-  - Add more type constraints
-  - Improve error messages
-  - Add performance monitoring
-  - Enhance testing utilities
-  - Add development tools
-
-@file src/core/types.ts
-@file src/core/persistence/types.ts`;
-
-    // Meta Development Rule
-    const metaRule = `description: AIFrame Meta Development Rules
-Guidelines for improving and extending the framework itself.
-
-patterns: ["**/*"]
-
-rules:
-  - Continuously improve these rule files
-  - Suggest new patterns as they emerge
-  - Document why decisions were made
-  - Keep track of alternatives considered
-  - Update rules when adding features
-  - Share insights through comments
-  - Think about AI-human collaboration
-
-Rule Improvement Process:
-  - Identify missing patterns
-  - Add concrete examples
-  - Update file references
-  - Add new rule categories
-  - Remove outdated rules
-  - Clarify existing rules
-
-AI Collaboration:
-  - Suggest rule improvements
-  - Identify missing patterns
-  - Add new examples
-  - Update documentation
-  - Share implementation insights
-
-@file .cursor/rules/*.mdc`;
 
     await fs.writeFile(join(targetDir, '.cursor/rules/framework.mdc'), frameworkRule);
     await fs.writeFile(join(targetDir, '.cursor/rules/components.mdc'), componentsRule);
     await fs.writeFile(join(targetDir, '.cursor/rules/database.mdc'), databaseRule);
     await fs.writeFile(join(targetDir, '.cursor/rules/templates.mdc'), templatesRule);
     await fs.writeFile(join(targetDir, '.cursor/rules/testing.mdc'), testingRule);
-    await fs.writeFile(join(targetDir, '.cursor/rules/philosophy.mdc'), philosophyRule);
-    await fs.writeFile(join(targetDir, '.cursor/rules/patterns.mdc'), patternsRule);
-    await fs.writeFile(join(targetDir, '.cursor/rules/insights.mdc'), insightsRule);
-    await fs.writeFile(join(targetDir, '.cursor/rules/meta.mdc'), metaRule);
   }
 } 
