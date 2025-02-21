@@ -80,7 +80,8 @@ export class AppGenerator {
       'src/public/css',
       'src/public/js',
       'migrations',
-      'tests'
+      'tests',
+      '.cursor/rules'
     ];
 
     for (const dir of dirs) {
@@ -95,6 +96,7 @@ export class AppGenerator {
     await this.generateBaseTemplate(targetDir);
     await this.generateEnvExample(targetDir, data);
     await this.generateJestConfig(targetDir);
+    await this.generateCursorRules(targetDir, data);
 
     // Generate database configuration if needed
     if (data.database !== 'none') {
@@ -486,5 +488,102 @@ export async function connect() {
     }
 
     return scripts;
+  }
+
+  private async generateCursorRules(targetDir: string, data: TemplateData): Promise<void> {
+    // Framework Rule
+    const frameworkRule = `description: AIFrame Framework Overview
+This is a server-side web framework optimized for AI-human collaboration.
+
+patterns: ["**/*.ts", "**/*.tsx"]
+
+rules:
+  - Framework follows a component-based architecture with intent-driven design
+  - Each component must have an intent file describing its purpose and capabilities
+  - Components are server-side rendered using EJS templates
+  - All code must be TypeScript with strict type checking
+
+@file src/core/types.ts
+@file README.md`;
+
+    // Components Rule
+    const componentsRule = `description: AIFrame Component Guidelines
+Rules for creating and modifying components in AIFrame.
+
+patterns: ["src/components/**/*.ts", "src/features/**/*.ts"]
+
+rules:
+  - Each component must implement the ServerComponent interface
+  - Every component needs an associated intent file
+  - Component state should be immutable
+  - Handle all errors gracefully
+  - Include proper type definitions
+  - Follow naming convention: [Name]Component.ts and [name].intent.ts
+
+Component Structure:
+  - intent: Describes component purpose and capabilities
+  - render: Returns HTML string
+  - handleAction: Processes user actions
+  - getState: Returns current state
+
+@file src/components/home.component.ts
+@file src/core/types.ts`;
+
+    // Database Rule
+    const databaseRule = `description: AIFrame Database Guidelines
+Rules for database operations and migrations.
+
+patterns: ["src/core/persistence/**/*.ts", "migrations/**/*.ts"]
+
+rules:
+  - Use provided adapter interfaces for database operations
+  - Always handle database errors and connection issues
+  - Use migrations for schema changes
+  - Include rollback functionality
+  - Use transactions for multi-step operations
+  - Never expose database errors to users
+
+@file src/core/persistence/types.ts
+${data.database === 'postgres' ? '@file src/core/persistence/postgres.adapter.ts' : ''}
+${data.database === 'mongodb' ? '@file src/core/persistence/mongo.adapter.ts' : ''}`;
+
+    // Templates Rule
+    const templatesRule = `description: AIFrame Template Guidelines
+Rules for working with EJS templates.
+
+patterns: ["src/templates/**/*.ejs"]
+
+rules:
+  - Use layout.ejs as the base template
+  - Always escape user-generated content
+  - Include CSRF tokens in forms
+  - Keep logic in components, not templates
+  - Use proper HTML5 structure
+  - Follow accessibility guidelines
+
+@file src/templates/layout.ejs`;
+
+    // Testing Rule
+    const testingRule = `description: AIFrame Testing Guidelines
+Rules for writing and maintaining tests.
+
+patterns: ["tests/**/*.test.ts", "**/*.test.ts"]
+
+rules:
+  - Write tests for all components
+  - Test both success and error cases
+  - Mock external dependencies
+  - Use provided test utilities
+  - Follow AAA pattern (Arrange, Act, Assert)
+  - Test intent implementations
+
+@file src/__tests__/setup.ts
+@file jest.config.js`;
+
+    await fs.writeFile(join(targetDir, '.cursor/rules/framework.rule'), frameworkRule);
+    await fs.writeFile(join(targetDir, '.cursor/rules/components.rule'), componentsRule);
+    await fs.writeFile(join(targetDir, '.cursor/rules/database.rule'), databaseRule);
+    await fs.writeFile(join(targetDir, '.cursor/rules/templates.rule'), templatesRule);
+    await fs.writeFile(join(targetDir, '.cursor/rules/testing.rule'), testingRule);
   }
 } 
