@@ -27,7 +27,9 @@ describe('IndexComponent', () => {
   });
 
   beforeEach(() => {
-    runtime = new Runtime(join(__dirname, '../../../templates'));
+    // Use absolute path for templates
+    const templatesDir = join(process.cwd(), 'src/templates');
+    runtime = new Runtime(templatesDir);
     component = new IndexComponent(runtime);
     testComponent = new TestComponent();
   });
