@@ -4,7 +4,8 @@
   "description": "A server-side web framework optimized for AI-human collaboration",
   "main": "dist/index.js",
   "bin": {
-    "aiframe-migrate": "./dist/core/persistence/migrations/cli.js"
+    "aiframe-migrate": "./dist/core/persistence/migrations/cli.js",
+    "create-aiframe-app": "./dist/core/generator/cli.js"
   },
   "scripts": {
     "build": "tsc",
@@ -15,7 +16,8 @@
     "migrate:create": "npm run migrate create",
     "migrate:up": "npm run migrate up",
     "migrate:down": "npm run migrate down",
-    "migrate:status": "npm run migrate status"
+    "migrate:status": "npm run migrate status",
+    "create-app": "ts-node src/core/generator/cli.ts"
   },
   "dependencies": {
     "@types/mongodb": "^4.0.6",
