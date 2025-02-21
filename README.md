@@ -1,6 +1,6 @@
-# AIFrame
+# CogniFrame
 
-A server-side web framework optimized for AI-human collaboration. AIFrame is designed to make it easy for AI agents to understand, modify, and maintain web applications while working alongside human developers.
+A server-side web framework optimized for AI-human collaboration. CogniFrame is designed to make it easy for AI agents to understand, modify, and maintain web applications while working alongside human developers.
 
 ## Key Features
 
@@ -26,7 +26,7 @@ A server-side web framework optimized for AI-human collaboration. AIFrame is des
 
 ## Component Example
 
-Components in AIFrame are defined by their intent and implementation:
+Components in CogniFrame are defined by their intent and implementation:
 
 ```typescript
 // Intent definition
@@ -91,9 +91,9 @@ export class CounterComponent implements ServerComponent {
 - `npm test` - Run tests
 - `npm start` - Start production server
 
-## Why AIFrame?
+## Why CogniFrame?
 
-AIFrame is designed to make web development more accessible to AI agents by:
+CogniFrame is designed to make web development more accessible to AI agents by:
 
 1. **Clear Intent**: Every component explicitly declares what it does and how it can be used
 2. **Type Safety**: TypeScript throughout ensures reliable code generation
@@ -171,14 +171,14 @@ Note: If PostgreSQL is not available, database-related tests will be skipped.
 
 ### Installation
 
-There are two ways to create a new AIFrame application:
+There are two ways to create a new CogniFrame application:
 
 #### Method 1: Using the Local Generator
 
-1. Clone the AIFrame repository:
+1. Clone the CogniFrame repository:
    ```bash
-   git clone https://github.com/markng/aiframe.git
-   cd aiframe
+   git clone https://github.com/markng/cogniframe.git
+   cd cogniframe
    ```
 
 2. Install dependencies and build the framework:
@@ -193,9 +193,9 @@ There are two ways to create a new AIFrame application:
    cd ../my-app
    ```
 
-4. Run the generator from the AIFrame directory:
+4. Run the generator from the CogniFrame directory:
    ```bash
-   node ../aiframe/dist/core/generator/cli.js
+   node ../cogniframe/dist/core/generator/cli.js
    ```
 
    Follow the prompts to configure your application.
@@ -204,7 +204,7 @@ There are two ways to create a new AIFrame application:
 
 1. Clone the starter template:
    ```bash
-   git clone https://github.com/markng/aiframe-starter.git my-app
+   git clone https://github.com/markng/cogniframe-starter.git my-app
    cd my-app
    rm -rf .git  # Remove the template's git history
    git init     # Start fresh git history

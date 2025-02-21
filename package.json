@@ -1,12 +1,36 @@
 {
-  "name": "aiframe",
+  "name": "cogniframe",
   "version": "0.1.0",
   "description": "A server-side web framework optimized for AI-human collaboration",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
-    "aiframe-migrate": "./dist/core/persistence/migrations/cli.js",
-    "create-aiframe-app": "./dist/core/generator/cli.js"
+    "cogniframe-migrate": "./dist/core/persistence/migrations/cli.js",
+    "create-cogniframe-app": "./dist/core/generator/cli.js"
   },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "web-framework",
+    "server-side",
+    "typescript",
+    "ai",
+    "express",
+    "ssr"
+  ],
+  "author": "Mark Ng",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/markng/cogniframe"
+  },
+  "bugs": {
+    "url": "https://github.com/markng/cogniframe/issues"
+  },
+  "homepage": "https://github.com/markng/cogniframe#readme",
   "scripts": {
     "build": "tsc",
     "test": "jest --config=package.json --coverage --coverageReporters='text-summary'",
