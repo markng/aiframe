@@ -1,0 +1,148 @@
+---
+description: 
+globs: 
+---
+ ---
+description: AIFrame Development Lessons Learned
+Guidelines based on practical experience and recent improvements.
+
+patterns: ["**/*"]
+
+rules:
+  # Test Debugging Protocol
+  - Use --detectOpenHandles for identifying resource leaks
+  - Add comprehensive debug logging in tests
+  - Log critical state changes and operations
+  - Use absolute paths for file operations in tests
+  - Ensure proper cleanup in beforeAll/afterAll hooks
+  - Track and log environment variables in CI
+  - Document debugging steps in test files
+
+  # Database Connection Management
+  - Use defensive disconnect methods
+  - Implement timeouts for connection operations
+  - Clean up transactions in failure scenarios
+  - Log connection lifecycle events
+  - Use connection pools appropriately
+  - Handle reconnection scenarios
+  - Document connection requirements
+
+  # Version Handling
+  - Use absolute paths for reading package.json
+  - Keep version in sync between package.json and code
+  - Log version information during initialization
+  - Use dynamic version references in templates
+  - Document version bumping process
+  - Handle version conflicts in CI
+  - Test version-dependent features
+
+  # PR and Link Management
+  - Always open PR links in browser after creation
+  - Include direct links to relevant files
+  - Add links to run tests in PR description
+  - Document PR dependencies and relationships
+  - Track PR status in development notes
+  - Use PR templates consistently
+  - Link related PRs together
+  - Use --body-file for PR descriptions to preserve formatting
+  - Create temporary PR description files when needed
+  - Clean up temporary files after PR creation
+
+  # PR Creation Example
+  ```bash
+  # Create temporary PR description file
+  cat > pr-description.md << EOL
+  ## Description
+  This PR adds new features:
+  - Feature 1
+  - Feature 2
+
+  ## Testing
+  All tests passing
+  EOL
+
+  # Create PR with proper formatting
+  gh pr create --title "feat: add new features" --body-file pr-description.md
+
+  # Clean up
+  rm pr-description.md
+  ```
+
+Examples:
+  # Test Debugging Example
+  ```typescript
+  describe('Component', () => {
+    beforeAll(() => {
+      console.log('Environment:', process.env.NODE_ENV);
+      console.log('Reading from:', process.cwd());
+    });
+
+    afterAll(async () => {
+      // Ensure cleanup
+      await cleanup();
+      // Wait for any pending operations
+      await new Promise(resolve => setTimeout(resolve, 100));
+    });
+  });
+  ```
+
+  # Database Connection Example
+  ```typescript
+  async disconnect(): Promise<void> {
+    if (!this.pool) return;
+    
+    try {
+      // Clean up transactions
+      const client = await this.pool.connect();
+      try {
+        await client.query('ROLLBACK');
+        await client.query('DISCARD ALL');
+      } finally {
+        client.release();
+      }
+      
+      // End pool with timeout
+      const endPromise = this.pool.end();
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Pool end timeout')), 5000);
+      });
+      await Promise.race([endPromise, timeoutPromise]);
+    } catch (error) {
+      console.error('Disconnect error:', error);
+      throw error;
+    }
+  }
+  ```
+
+  # Version Handling Example
+  ```typescript
+  const packagePath = join(process.cwd(), 'package.json');
+  console.log('Reading package.json from:', packagePath);
+  const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'));
+  console.log('Package version:', packageJson.version);
+  ```
+
+  # PR Management Example
+  ```typescript
+  // After creating PR
+  const prUrl = 'https://github.com/org/repo/pull/123';
+  if (process.platform === 'darwin') {
+    await exec('open ' + prUrl);
+  } else if (process.platform === 'win32') {
+    await exec('start ' + prUrl);
+  } else {
+    await exec('xdg-open ' + prUrl);
+  }
+  ```
+
+Best Practices:
+  - Add examples for complex patterns
+  - Document rationale for rules
+  - Keep rules updated based on experience
+  - Cross-reference related rules
+  - Include real-world scenarios
+  - Maintain living documentation
+
+@file src/server.ts
+@file README.md
+@file .cursor/rules/*.mdc
