@@ -580,10 +580,10 @@ rules:
 @file src/__tests__/setup.ts
 @file jest.config.js`;
 
-    await fs.writeFile(join(targetDir, '.cursor/rules/framework.rule'), frameworkRule);
-    await fs.writeFile(join(targetDir, '.cursor/rules/components.rule'), componentsRule);
-    await fs.writeFile(join(targetDir, '.cursor/rules/database.rule'), databaseRule);
-    await fs.writeFile(join(targetDir, '.cursor/rules/templates.rule'), templatesRule);
-    await fs.writeFile(join(targetDir, '.cursor/rules/testing.rule'), testingRule);
+    await fs.writeFile(join(targetDir, '.cursor/rules/framework.mdc'), frameworkRule);
+    await fs.writeFile(join(targetDir, '.cursor/rules/components.mdc'), componentsRule);
+    await fs.writeFile(join(targetDir, '.cursor/rules/database.mdc'), databaseRule);
+    await fs.writeFile(join(targetDir, '.cursor/rules/templates.mdc'), templatesRule);
+    await fs.writeFile(join(targetDir, '.cursor/rules/testing.mdc'), testingRule);
   }
 } 
