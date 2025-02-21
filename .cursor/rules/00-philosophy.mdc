@@ -1,6 +1,6 @@
 ---
 description: AIFrame Framework Development Philosophy
-patterns: ["src/core/**/*.ts", "src/features/**/*.ts"]
+globs: 
 ---
 
 Core Principles:

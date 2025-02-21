@@ -1,6 +1,6 @@
 ---
 description: AIFrame Framework Design Patterns
-patterns: ["src/core/**/*.ts", "src/features/**/*.ts", "src/components/**/*.ts"]
+globs: 
 ---
 
 Implementation Guidelines:
