@@ -41,7 +41,7 @@ export class IndexComponent implements ServerComponent {
   async handleAction(req: Request, res: Response): Promise<void> {
     // Handle docs viewing if needed
     if (req.path === '/docs') {
-      res.redirect('https://github.com/yourusername/aiframe#readme');
+      res.redirect('https://github.com/markng/aiframe#readme');
       return;
     }
     res.redirect('/');
