@@ -1,0 +1,157 @@
+<%- include('layout', { 
+  title: title,
+  body: `
+    <div class="aiframe-welcome">
+      <h1>Welcome to AIFrame</h1>
+      <p class="version">v${state.frameworkVersion} (${state.environment})</p>
+      
+      <div class="quick-start">
+        <h2>Quick Start</h2>
+        <p>Create your first component by adding these files:</p>
+        
+        <div class="code-example">
+          <h3>src/features/hello/intent.ts</h3>
+          <pre><code>import { Intent } from '../../core/types';
+
+export const helloIntent: Intent = {
+  name: 'hello',
+  description: 'A simple hello world component',
+  capabilities: ['greet'],
+  dataStructure: {
+    message: 'string'
+  },
+  userActions: [
+    {
+      name: 'greet',
+      description: 'Display a greeting',
+      method: 'GET',
+      path: '/hello',
+      expectedOutcome: 'Shows a greeting message'
+    }
+  ]
+};</code></pre>
+
+          <h3>src/features/hello/component.ts</h3>
+          <pre><code>import { ServerComponent, ViewData } from '../../core/types';
+import { helloIntent } from './intent';
+
+export class HelloComponent implements ServerComponent {
+  intent = helloIntent;
+  private state = { message: 'Hello, World!' };
+
+  async render(data: ViewData): Promise<string> {
+    return \`
+      <div class="hello">
+        <h1>\${this.state.message}</h1>
+      </div>
+    \`;
+  }
+
+  async handleAction(req: Request, res: Response): Promise<void> {
+    res.redirect('/');
+  }
+
+  getState() {
+    return this.state;
+  }
+}</code></pre>
+        </div>
+
+        <h2>Register Your Component</h2>
+        <p>Add this to your server.ts:</p>
+        <pre><code>import { HelloComponent } from './features/hello/component';
+
+const hello = new HelloComponent();
+runtime.registerComponent('hello', hello);</code></pre>
+      </div>
+
+      ${Array.from(state.registeredComponents.entries())
+        .filter(([name]) => !name.startsWith('system:'))
+        .length > 0 ? `
+        <div class="registered-components">
+          <h2>Registered Components</h2>
+          <div class="components-grid">
+            ${Array.from(state.registeredComponents.entries())
+              .filter(([name]) => !name.startsWith('system:'))
+              .map(([name, component]) => `
+                <div class="component-card">
+                  <h3>${component.intent.name}</h3>
+                  <p>${component.intent.description}</p>
+                  <div class="capabilities">
+                    ${component.intent.capabilities.map(cap => 
+                      `<span class="capability">${cap}</span>`
+                    ).join('')}
+                  </div>
+                </div>
+              `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      <style>
+        .aiframe-welcome {
+          padding: 2rem;
+        }
+        
+        .version {
+          color: #666;
+          font-size: 0.9rem;
+        }
+        
+        .quick-start {
+          margin: 2rem 0;
+          padding: 1rem;
+          background: #f8f9fa;
+          border-radius: 8px;
+        }
+        
+        .code-example {
+          background: #fff;
+          padding: 1rem;
+          border-radius: 4px;
+          margin: 1rem 0;
+        }
+        
+        pre {
+          background: #282c34;
+          color: #abb2bf;
+          padding: 1rem;
+          border-radius: 4px;
+          overflow-x: auto;
+        }
+        
+        code {
+          font-family: 'Monaco', 'Menlo', monospace;
+          font-size: 0.9rem;
+        }
+        
+        .components-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 1rem;
+          margin-top: 1rem;
+        }
+        
+        .component-card {
+          background: #fff;
+          padding: 1rem;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .capabilities {
+          margin-top: 0.5rem;
+        }
+        
+        .capability {
+          display: inline-block;
+          padding: 0.25rem 0.5rem;
+          background: #e9ecef;
+          border-radius: 4px;
+          margin: 0.25rem;
+          font-size: 0.8rem;
+        }
+      </style>
+    </div>
+  `
+}) %> 

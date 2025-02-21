@@ -1,0 +1,37 @@
+<%- include('layout', { 
+  title: title,
+  body: `
+    <div class="aiframe-welcome">
+      <h1>Welcome to AIFrame</h1>
+      <p class="version">v${state.frameworkVersion} (${state.environment})</p>
+      
+      <div class="quick-start">
+        <h2>Quick Start</h2>
+        <p>Create your first component by adding these files:</p>
+      </div>
+
+      ${Array.from(state.registeredComponents.entries())
+        .filter(([name]) => !name.startsWith('system:'))
+        .length > 0 ? `
+        <div class="registered-components">
+          <h2>Registered Components</h2>
+          <div class="components-grid">
+            ${Array.from(state.registeredComponents.entries())
+              .filter(([name]) => !name.startsWith('system:'))
+              .map(([name, component]) => `
+                <div class="component-card">
+                  <h3>${component.intent.name}</h3>
+                  <p>${component.intent.description}</p>
+                  <div class="capabilities">
+                    ${component.intent.capabilities.map(cap => 
+                      `<span class="capability">${cap}</span>`
+                    ).join('')}
+                  </div>
+                </div>
+              `).join('')}
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `
+}) %> 
