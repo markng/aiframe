@@ -92,7 +92,7 @@ export class AppGenerator {
   private createTemplateData(options: GeneratorOptions): TemplateData {
     return {
       name: options.name,
-      description: options.description || `A web application built with AIFrame`,
+      description: options.description || `A web application built with cogniframe`,
       author: options.author || process.env.USER || 'unknown',
       version: options.version || '0.1.0',
       features: options.features || ['basic'],
@@ -376,7 +376,7 @@ export class HomeComponent implements ServerComponent {
     return \`
       <div class="home">
         <h1>Welcome</h1>
-        <p>Your new AIFrame application is ready!</p>
+        <p>Your new cogniframe application is ready!</p>
       </div>
     \`;
   }
@@ -778,8 +778,8 @@ export const dbConfig = {
 
   private async generateCursorRules(targetDir: string, data: TemplateData): Promise<void> {
     // Framework Usage Rule
-    const frameworkRule = `description: AIFrame Application Guidelines
-A guide to building applications with AIFrame.
+    const frameworkRule = `description: cogniframe Application Guidelines
+A guide to building applications with cogniframe.
 
 patterns: ["**/*.ts", "**/*.tsx"]
 
@@ -801,7 +801,7 @@ Getting Started:
 @file README.md`;
 
     // Components Rule
-    const componentsRule = `description: AIFrame Component Development
+    const componentsRule = `description: cogniframe Component Development
 Guidelines for creating and modifying application components.
 
 patterns: ["src/components/**/*.ts", "src/features/**/*.ts"]
@@ -823,7 +823,7 @@ Component Structure:
 @file src/components/home.component.ts`;
 
     // Database Rule
-    const databaseRule = `description: AIFrame Database Usage
+    const databaseRule = `description: cogniframe Database Usage
 Guidelines for database operations in your application.
 
 patterns: ["src/core/persistence/**/*.ts", "migrations/**/*.ts"]
@@ -841,7 +841,7 @@ ${data.database === 'postgres' ? '@file src/core/persistence/postgres.adapter.ts
 ${data.database === 'sqlite' ? '@file src/core/persistence/sqlite.adapter.ts' : ''}`;
 
     // Templates Rule
-    const templatesRule = `description: AIFrame Template Development
+    const templatesRule = `description: cogniframe Template Development
 Guidelines for working with templates in your application.
 
 patterns: ["src/templates/**/*.ejs"]
@@ -857,7 +857,7 @@ rules:
 @file src/templates/layout.ejs`;
 
     // Testing Rule
-    const testingRule = `description: AIFrame Testing Guidelines
+    const testingRule = `description: cogniframe Testing Guidelines
 Rules for testing your application.
 
 patterns: ["tests/**/*.test.ts", "**/*.test.ts"]

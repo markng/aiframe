@@ -15,7 +15,7 @@ async function question(query: string): Promise<string> {
 }
 
 async function main() {
-  console.log('Welcome to AIFrame App Generator!\n');
+  console.log('Welcome to cogniframe App Generator!\n');
 
   const options: GeneratorOptions = {
     name: '',

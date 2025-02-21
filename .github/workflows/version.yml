@@ -52,18 +52,31 @@ jobs:
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Bump version
+      - name: Bump version and create tag
         id: version-bump
         run: |
+          # Get bump type
           BUMP_TYPE=$(echo "${{ steps.bump-type.outputs.type }}")
+          
+          # Bump version in package.json without git operations
           NEW_VERSION=$(npm --no-git-tag-version version $BUMP_TYPE)
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           
           # Update package.json
           git add package.json
           git commit -m "chore: bump version to ${NEW_VERSION} [skip ci]"
-          git push
-
-          # Create and push tag separately
+          
+          # Try to push changes
+          git push || {
+            # If push fails, pull latest changes and try again
+            git pull --rebase
+            git push
+          }
+          
+          # Delete existing tag if it exists (both local and remote)
+          git tag -d ${NEW_VERSION} 2>/dev/null || true
+          git push --delete origin ${NEW_VERSION} 2>/dev/null || true
+          
+          # Create and push new tag
           git tag -a ${NEW_VERSION} -m "Release ${NEW_VERSION}"
           git push origin ${NEW_VERSION} 

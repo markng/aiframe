@@ -40,6 +40,15 @@ jobs:
           POSTGRES_PASSWORD: postgres
           SQLITE_FILE: ':memory:'
 
+      - name: Verify package version matches tag
+        run: |
+          PKG_VERSION="v$(node -p "require('./package.json').version")"
+          TAG_VERSION="${{ github.ref_name }}"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "Error: Package version ($PKG_VERSION) does not match tag version ($TAG_VERSION)"
+            exit 1
+          fi
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -50,7 +59,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to NPM
-        run: npm publish --provenance --access public
+        run: |
+          # Ensure we're publishing the correct version
+          echo "Publishing version: $(node -p "require('./package.json').version")"
+          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > .npmrc
+          npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
