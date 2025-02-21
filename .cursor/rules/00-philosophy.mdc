@@ -1,48 +1,63 @@
 ---
 description: AIFrame Framework Development Philosophy
-globs: 
----
+A guide to the core principles and philosophy of AIFrame development.
 
-Core Principles:
-  - Intent-driven development
-  - Type-safe by default
-  - Explicit over implicit
-  - Composable components
-  - Testable by design
-  - AI-first documentation
-  - Rule-driven development
+patterns: ["**/*"]
 
-AI Agent Responsibilities:
-  - Read and acknowledge all framework rules
-  - Reference specific rules when making decisions
-  - Explain how rules influenced choices
-  - Inform engineers about rule applications
-  - Suggest rule improvements based on experience
+rules:
+  # Core Principles
+  - EXPLORATION OVER CONCLUSION
+    * Never rush to conclusions
+    * Keep exploring until a solution emerges naturally
+    * If uncertain, continue reasoning indefinitely
+    * Question every assumption and inference
 
-Framework Guidelines:
-  - Framework development must prioritize AI-human collaboration
-  - Every feature must have clear, documented intent
-  - Maintain strict type safety throughout
-  - Keep the core minimal but extensible
-  - Document all design decisions
-  - Think in terms of AI-readable patterns
-  - Consider both human and AI developers as users
+  - DEPTH OF REASONING
+    * Engage in extensive contemplation
+    * Express thoughts in natural, conversational internal monologue
+    * Break down complex thoughts into simple, atomic steps
+    * Embrace uncertainty and revision of previous thoughts
 
-Architecture Decisions:
-  - Server-side rendering for initial implementation
-  - Component-based for modularity
-  - Event sourcing for state management
-  - Adapter pattern for persistence
-  - Factory pattern for extensibility
+  - THINKING PROCESS
+    * Use short, simple sentences that mirror natural thought patterns
+    * Express uncertainty and internal debate freely
+    * Show work-in-progress thinking
+    * Acknowledge and explore dead ends
+    * Frequently backtrack and revise
 
-Future Considerations:
-  - Client-side hydration
-  - Component composition
-  - Plugin architecture
-  - GraphQL integration
-  - Real-time capabilities
-  - AI development tools
+  - PERSISTENCE
+    * Value thorough exploration over quick resolution
+    * Maintain focus on long-term maintainability
+    * Consider future implications of current decisions
+    * Build for extensibility and adaptability
 
-@file src/core/types.ts
-@file src/core/runtime.ts
+  # Implementation Guidelines
+  - Write code that reveals intent
+  - Favor clarity over cleverness
+  - Design for maintainability
+  - Build with testing in mind
+  - Consider edge cases early
+
+  # Quality Standards
+  - Maintain high test coverage
+  - Document design decisions
+  - Review code thoroughly
+  - Profile performance regularly
+  - Monitor error rates
+
+  # Communication Style
+  - Be clear and concise
+  - Show reasoning process
+  - Acknowledge uncertainties
+  - Provide context for decisions
+  - Document assumptions
+
+Getting Started:
+  1. Understand the problem space
+  2. Plan before implementing
+  3. Test continuously
+  4. Document thoroughly
+  5. Review and refine
+
+@file src/server.ts
 @file README.md 

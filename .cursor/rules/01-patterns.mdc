@@ -1,72 +1,75 @@
 ---
 description: AIFrame Framework Design Patterns
-globs: 
----
+Guidelines for implementing and maintaining design patterns in AIFrame.
 
-Implementation Guidelines:
-  - Start with interface definitions
-  - Use TypeScript's type system to enforce patterns
-  - Implement interfaces before concrete classes
-  - Make dependencies explicit through interfaces
-  - Use factory patterns for object creation
-  - Keep core interfaces minimal and focused
-  - Follow SOLID principles
-  - Use union types for type safety
-  - Implement error handling consistently
-  - Add type guards where needed
-  - Keep state immutable
-  - Use builders for complex objects
-  - Document edge cases
+patterns: ["**/*"]
 
-Core Patterns:
-  - Intent Declaration:
-    ```typescript
-    export interface Intent {
-      name: string;
-      description: string;
-      capabilities: string[];
-      dataStructure: Record<string, unknown>;
-      userActions: UserAction[];
-    }
-    ```
+rules:
+  # Architectural Patterns
+  - COMPONENT-BASED ARCHITECTURE
+    * Each component has clear intent
+    * Components are self-contained
+    * Follow single responsibility principle
+    * Implement proper interfaces
+    * Include comprehensive tests
 
-  - Component Structure:
-    ```typescript
-    export interface ServerComponent {
-      intent: Intent;
-      render: (data: ViewData) => Promise<string>;
-      handleAction: (req: Request, res: Response) => Promise<void>;
-      getState: () => unknown;
-    }
-    ```
+  - EVENT-DRIVEN DESIGN
+    * Use clear event naming
+    * Maintain event history
+    * Handle event failures gracefully
+    * Implement proper rollback
+    * Document event flows
 
-  - Adapter Pattern:
-    ```typescript
-    export interface PersistenceAdapter<T = unknown> {
-      save(key: string, data: T): Promise<void>;
-      load(key: string): Promise<T | null>;
-      delete(key: string): Promise<void>;
-      query(filter: unknown): Promise<T[]>;
-    }
-    ```
+  - PERSISTENCE PATTERNS
+    * Use appropriate adapters
+    * Implement proper transactions
+    * Handle connection failures
+    * Manage resource cleanup
+    * Monitor performance
 
-  - Event Sourcing:
-    ```typescript
-    export interface EventStore {
-      append(streamId: string, events: StateEvent[]): Promise<void>;
-      read(streamId: string, fromVersion?: number): Promise<StateEvent[]>;
-      getSnapshot(streamId: string): Promise<StateSnapshot | null>;
-      saveSnapshot(streamId: string, snapshot: StateSnapshot): Promise<void>;
-    }
-    ```
+  # Implementation Patterns
+  - ERROR HANDLING
+    * Use appropriate error types
+    * Include context in errors
+    * Log meaningful messages
+    * Implement recovery strategies
+    * Clean up resources
 
-Type System Guidelines:
-  - Use discriminated unions for state transitions
-  - Leverage TypeScript's inference capabilities
-  - Create reusable type utilities
-  - Document type constraints
-  - Use generics judiciously
+  - TESTING PATTERNS
+    * Write comprehensive unit tests
+    * Include integration tests
+    * Test edge cases
+    * Mock external dependencies
+    * Maintain test isolation
+
+  - PERFORMANCE PATTERNS
+    * Profile critical paths
+    * Optimize resource usage
+    * Monitor memory consumption
+    * Handle concurrent operations
+    * Implement proper caching
+
+  # Development Workflow
+  - Version Control
+    * Write meaningful commits
+    * Keep changes focused
+    * Review code thoroughly
+    * Maintain clean history
+    * Document breaking changes
+
+  - Documentation
+    * Keep docs current
+    * Include examples
+    * Document assumptions
+    * Explain complex logic
+    * Update README
+
+Getting Started:
+  1. Review existing patterns
+  2. Follow established conventions
+  3. Test thoroughly
+  4. Document changes
+  5. Seek feedback
 
 @file src/core/types.ts
-@file src/core/persistence/types.ts
-@file src/core/persistence/factory.ts 
+@file src/core/runtime.ts 
