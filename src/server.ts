@@ -63,7 +63,7 @@ app.get('/docs', async (req: Request, res: Response) => {
 // Main route
 app.get('/', async (req: Request, res: Response) => {
   const viewData: ViewData = {
-    title: 'AIFrame',
+    title: 'cogniframe',
     state: indexComponent.getState(),
     csrfToken: generateToken(req, res),
     flash: req.session.flash
@@ -104,5 +104,5 @@ app.use(async (err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 app.listen(port, () => {
-  console.log(`AIFrame server running at http://localhost:${port}`);
+  console.log(`cogniframe server running at http://localhost:${port}`);
 }); 
