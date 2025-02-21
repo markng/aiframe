@@ -82,7 +82,7 @@ beforeAll(async () => {
         </div>
       <% } %>
       <div class="version-info">
-        <span class="version">v0.1.0</span>
+        <span class="version">v<%- state.frameworkVersion %></span>
       </div>`
     );
   } catch (error) {
