@@ -4,7 +4,7 @@ export interface GeneratorOptions {
   author?: string;
   version?: string;
   features?: string[];
-  database?: 'postgres' | 'mongodb' | 'none';
+  database?: 'postgres' | 'sqlite' | 'none';
   targetDir?: string;
 }
 
@@ -14,7 +14,7 @@ export interface TemplateData {
   author: string;
   version: string;
   features: string[];
-  database: 'postgres' | 'mongodb' | 'none';
+  database: 'postgres' | 'sqlite' | 'none';
   year: number;
 }
 

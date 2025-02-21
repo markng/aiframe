@@ -124,7 +124,7 @@ export class AppGenerator {
         version: data.version,
         description: data.description,
         author: data.author,
-        main: 'dist/server.js',
+        main: 'dist/server.ts',
         scripts: data.scripts,
         dependencies: data.dependencies,
         devDependencies: data.devDependencies
@@ -364,27 +364,26 @@ export class HomeComponent implements ServerComponent {
   }
 
   private async generateEnvExample(targetDir: string, data: TemplateData): Promise<void> {
-    const content = `# Server Configuration
+    const envTemplate = (data: TemplateData) => `
+# Server Configuration
 PORT=3000
 NODE_ENV=development
-SESSION_SECRET=your-secret-key
 
 ${data.database === 'postgres' ? `
 # PostgreSQL Configuration
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=your_database
-POSTGRES_USER=your_user
-POSTGRES_PASSWORD=your_password
+POSTGRES_DB=${data.name}_db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
 ` : ''}
-
-${data.database === 'mongodb' ? `
-# MongoDB Configuration
-MONGODB_URI=mongodb://localhost:27017/your_database
+${data.database === 'sqlite' ? `
+# SQLite Configuration
+SQLITE_FILE=./${data.name}.db
 ` : ''}
 `;
 
-    await fs.writeFile(join(targetDir, '.env.example'), content);
+    await fs.writeFile(join(targetDir, '.env.example'), envTemplate(data));
   }
 
   private async generateJestConfig(targetDir: string): Promise<void> {
@@ -414,16 +413,13 @@ export const pool = new Pool({
 });`;
 
       await fs.writeFile(join(targetDir, 'src/database.ts'), content);
-    } else if (data.database === 'mongodb') {
-      const content = `import { MongoClient } from 'mongodb';
+    } else if (data.database === 'sqlite') {
+      const content = `import { PersistenceFactory } from './core/persistence/factory';
 
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/your_database';
-export const client = new MongoClient(uri);
-
-export async function connect() {
-  await client.connect();
-  return client.db();
-}`;
+export const dbConfig = {
+  type: 'sqlite' as const,
+  filename: process.env.SQLITE_FILE || './${data.name}.db'
+};`;
 
       await fs.writeFile(join(targetDir, 'src/database.ts'), content);
     }
@@ -441,8 +437,9 @@ export async function connect() {
 
     if (data.database === 'postgres') {
       deps['pg'] = '^8.13.3';
-    } else if (data.database === 'mongodb') {
-      deps['mongodb'] = '^6.13.1';
+    } else if (data.database === 'sqlite') {
+      deps['@types/better-sqlite3'] = '^7.6.9';
+      deps['better-sqlite3'] = '^9.4.3';
     }
 
     return deps;
@@ -465,8 +462,8 @@ export async function connect() {
 
     if (data.database === 'postgres') {
       deps['@types/pg'] = '^8.11.11';
-    } else if (data.database === 'mongodb') {
-      deps['@types/mongodb'] = '^4.0.6';
+    } else if (data.database === 'sqlite') {
+      deps['@types/better-sqlite3'] = '^7.6.9';
     }
 
     return deps;
@@ -476,7 +473,7 @@ export async function connect() {
     const scripts: Record<string, string> = {
       'build': 'tsc',
       'dev': 'ts-node-dev --respawn --transpile-only src/server.ts',
-      'start': 'node dist/server.js',
+      'start': 'node dist/server.ts',
       'test': 'jest'
     };
 
@@ -552,7 +549,7 @@ rules:
 
 @file src/core/persistence/types.ts
 ${data.database === 'postgres' ? '@file src/core/persistence/postgres.adapter.ts' : ''}
-${data.database === 'mongodb' ? '@file src/core/persistence/mongo.adapter.ts' : ''}`;
+${data.database === 'sqlite' ? '@file src/core/persistence/sqlite.adapter.ts' : ''}`;
 
     // Templates Rule
     const templatesRule = `description: AIFrame Template Development

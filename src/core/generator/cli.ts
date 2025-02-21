@@ -40,8 +40,8 @@ async function main() {
   options.author = await question('Author (optional): ');
 
   // Get database preference
-  const dbChoice = await question('Database (postgres/mongodb/none) [none]: ');
-  if (dbChoice === 'postgres' || dbChoice === 'mongodb') {
+  const dbChoice = await question('Database (postgres/sqlite/none) [none]: ');
+  if (dbChoice === 'postgres' || dbChoice === 'sqlite') {
     options.database = dbChoice;
   }
 

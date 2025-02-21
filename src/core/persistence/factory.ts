@@ -1,20 +1,19 @@
 import { PersistenceAdapter } from '../types';
-import { MongoAdapter } from './mongo.adapter';
 import { PostgresAdapter, PostgresAdapterConfig } from './postgres.adapter';
+import { SQLiteAdapter, SQLiteAdapterConfig } from './sqlite.adapter';
 
-export type AdapterType = 'mongodb' | 'postgres';
+export type AdapterType = 'postgres' | 'sqlite';
 
 export interface AdapterConfig {
   type: AdapterType;
-  uri?: string;
-  database?: string;
-  collection?: string;
+  database: string;
   table?: string;
   schema?: string;
   host?: string;
   port?: number;
   user?: string;
   password?: string;
+  filename?: string;
 }
 
 export class PersistenceFactory {
@@ -31,24 +30,7 @@ export class PersistenceFactory {
     let adapter: PersistenceAdapter<T>;
 
     switch (config.type) {
-      case 'mongodb': {
-        if (!config.uri || !config.database || !config.collection) {
-          throw new Error('Missing required MongoDB configuration');
-        }
-
-        adapter = new MongoAdapter<T>(
-          config.uri,
-          config.database,
-          config.collection
-        );
-        break;
-      }
-
       case 'postgres': {
-        if (!config.database) {
-          throw new Error('Missing required PostgreSQL configuration');
-        }
-
         const pgConfig: PostgresAdapterConfig = {
           host: config.host || 'localhost',
           port: config.port || 5432,
@@ -58,8 +40,19 @@ export class PersistenceFactory {
           table: config.table || name,
           schema: config.schema || 'public'
         };
-
         adapter = new PostgresAdapter<T>(pgConfig);
+        break;
+      }
+
+      case 'sqlite': {
+        if (!config.filename) {
+          throw new Error('Missing required SQLite configuration: filename');
+        }
+        const sqliteConfig: SQLiteAdapterConfig = {
+          filename: config.filename,
+          table: config.table || name
+        };
+        adapter = new SQLiteAdapter<T>(sqliteConfig);
         break;
       }
 

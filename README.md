@@ -105,16 +105,36 @@ AIFrame is designed to make web development more accessible to AI agents by:
 
 This framework is in early development. Contributions and suggestions are welcome!
 
-### Running Tests
+### Branch Protection and PR Workflow
 
-The test suite includes both unit tests and integration tests. Some tests require a PostgreSQL database.
+To maintain code quality and ensure proper review, the following branch protection rules are recommended:
 
-1. Set up PostgreSQL for integration tests:
-   ```bash
-   # Create a test database and user
-   createdb aiframe_test
-   createuser -s postgres  # Create superuser if it doesn't exist
+1. **Main Branch Protection**
+   - Require pull request reviews before merging
+   - Require status checks to pass before merging
+   - Require branches to be up to date before merging
+   - Do not allow bypassing the above settings
+
+2. **Pull Request Process**
+   - Create a feature branch following the naming convention
+   - Make your changes and commit following the guidelines
+   - Create a PR using the template
+   - Request reviews from maintainers
+   - Address review comments
+   - Ensure all checks pass
+   - Squash and merge when approved
+
+3. **Branch Naming**
    ```
+   feature/description-of-feature
+   fix/issue-description
+   docs/documentation-update
+   refactor/refactoring-description
+   test/test-addition-description
+   chore/maintenance-task
+   ```
+
+For more details, see the development guidelines in `.cursor/rules/03-meta.mdc`.
 
 2. Configure test environment:
    ```bash
@@ -151,42 +171,59 @@ Note: If PostgreSQL is not available, database-related tests will be skipped.
 
 ### Installation
 
-1. Create a new directory for your project and initialize it:
+There are two ways to create a new AIFrame application:
+
+#### Method 1: Using the Local Generator
+
+1. Clone the AIFrame repository:
    ```bash
-   mkdir my-app
+   git clone https://github.com/markng/aiframe.git
+   cd aiframe
+   ```
+
+2. Install dependencies and build the framework:
+   ```bash
+   npm install
+   npm run build
+   ```
+
+3. Create a new directory for your project:
+   ```bash
+   mkdir ../my-app
+   cd ../my-app
+   ```
+
+4. Run the generator from the AIFrame directory:
+   ```bash
+   node ../aiframe/dist/core/generator/cli.js
+   ```
+
+   Follow the prompts to configure your application.
+
+#### Method 2: Using the Starter Template
+
+1. Clone the starter template:
+   ```bash
+   git clone https://github.com/markng/aiframe-starter.git my-app
    cd my-app
-   git init
-   ```
-
-2. Install AIFrame from GitHub:
-   ```bash
-   npm install markng/aiframe
-   ```
-
-3. Initialize a new AIFrame application:
-   ```bash
-   npx create-aiframe-app
-   ```
-
-   Or clone the starter template:
-   ```bash
-   git clone https://github.com/markng/aiframe-starter.git .
    rm -rf .git  # Remove the template's git history
    git init     # Start fresh git history
    ```
 
-4. Install dependencies:
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-5. Set up your environment:
+After installation (either method):
+
+1. Set up your environment:
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
-6. If using a database, set up your database configuration:
+2. If using a database, set up your database configuration:
    ```bash
    # For PostgreSQL
    createdb my_app_db
@@ -196,12 +233,12 @@ Note: If PostgreSQL is not available, database-related tests will be skipped.
    # Ensure MongoDB is running and update MONGODB_URI in .env
    ```
 
-7. Start the development server:
+3. Start the development server:
    ```bash
    npm run dev
    ```
 
-8. Visit http://localhost:3000 to see your application running!
+4. Visit http://localhost:3000 to see your application running!
 
 ### Project Structure
 
