@@ -1,40 +1,33 @@
-# Description
+## Description
 
-Please include a summary of the changes and the related issue. Please also include relevant motivation and context.
-
-Fixes # (issue)
+<!-- Please include a summary of the changes. List any dependencies that are required. -->
 
 ## Type of change
 
-Please delete options that are not relevant.
+<!-- Please prefix your PR title with one of:
+- "feat:" for new features (minor version bump)
+- "fix:" for bug fixes (patch version bump)
+- "docs:" for documentation changes (patch version bump)
+- "chore:" for maintenance tasks (patch version bump)
+- "refactor:" for code improvements (patch version bump)
+- "test:" for test changes (patch version bump)
+- Add "!" after the prefix for breaking changes (major version bump)
+  Example: "feat!: add new API that breaks compatibility"
+- Or start with "BREAKING CHANGE" for major version bumps
+-->
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Documentation update
-- [ ] Refactoring
-- [ ] Test addition/modification
-- [ ] Chore (dependency updates, maintenance, etc)
+## Checklist
 
-## How Has This Been Tested?
-
-Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce.
-
-- [ ] Test A
-- [ ] Test B
-
-## Checklist:
-
-- [ ] My code follows the branch naming convention
-- [ ] I have performed a self-review of my code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
+- [ ] My PR title follows the conventional commit format (see above)
 - [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
+- [ ] I have updated the documentation accordingly
+- [ ] My changes generate no new warnings
 - [ ] Any dependent changes have been merged and published
-- [ ] I have updated relevant rules in `.cursor/rules/`
+
+## Testing
+
+<!-- Please describe the tests that you ran to verify your changes. -->
 
 ## Additional Notes
 
-Add any additional notes about the PR here. 
+<!-- Add any additional notes for reviewers --> 
