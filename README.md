@@ -103,4 +103,108 @@ AIFrame is designed to make web development more accessible to AI agents by:
 
 ## Contributing
 
-This framework is in early development. Contributions and suggestions are welcome! 
+This framework is in early development. Contributions and suggestions are welcome!
+
+## Creating a New Application
+
+### Prerequisites
+- Node.js (v16.x or later)
+- npm (v7.x or later)
+- PostgreSQL or MongoDB (optional, if using a database)
+
+### Installation
+
+1. Install the AIFrame CLI globally:
+   ```bash
+   npm install -g create-aiframe-app
+   ```
+
+2. Create a new application:
+   ```bash
+   create-aiframe-app
+   ```
+
+3. Follow the interactive prompts:
+   ```
+   Project name: my-app
+   Description (optional): My first AIFrame application
+   Author (optional): Your Name
+   Database (postgres/mongodb/none) [none]: postgres
+   Features (comma-separated) [basic]: basic,auth,api
+   ```
+
+4. Once the project is generated, navigate to it and install dependencies:
+   ```bash
+   cd my-app
+   npm install
+   ```
+
+5. Set up your environment:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+6. If using a database, set up your database configuration:
+   ```bash
+   # For PostgreSQL
+   createdb my_app_db
+   npm run migrate:up
+
+   # For MongoDB
+   # Ensure MongoDB is running and update MONGODB_URI in .env
+   ```
+
+7. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+8. Visit http://localhost:3000 to see your application running!
+
+### Project Structure
+
+After creation, your project will have the following structure:
+```
+my-app/
+  ├── src/
+  │   ├── components/     # Application components
+  │   ├── features/       # Feature implementations
+  │   ├── templates/      # EJS templates
+  │   ├── public/         # Static assets
+  │   └── server.ts       # Server entry point
+  ├── tests/             # Test files
+  ├── migrations/        # Database migrations (if using a database)
+  ├── .cursor/
+  │   └── rules/         # AI development rules
+  ├── .env.example       # Environment variables template
+  ├── package.json       # Project configuration
+  ├── tsconfig.json      # TypeScript configuration
+  └── README.md          # Project documentation
+```
+
+### Next Steps
+
+1. Create your first component:
+   ```bash
+   # Create files manually or use the component generator (coming soon)
+   src/features/hello/intent.ts
+   src/features/hello/component.ts
+   ```
+
+2. Register your component in `src/server.ts`:
+   ```typescript
+   import { HelloComponent } from './features/hello/component';
+   
+   const hello = new HelloComponent();
+   runtime.registerComponent('hello', hello);
+   ```
+
+3. Add a template in `src/templates/hello.ejs`
+
+4. Start developing!
+
+For more detailed guides and examples, check out:
+- [Component Development Guide](https://github.com/markng/aiframe/wiki/Component-Development) (coming soon)
+- [Database Integration](https://github.com/markng/aiframe/wiki/Database-Integration) (coming soon)
+- [Deployment Guide](https://github.com/markng/aiframe/wiki/Deployment) (coming soon) 
