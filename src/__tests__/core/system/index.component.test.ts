@@ -3,16 +3,23 @@ import { Runtime } from '../../../core/runtime';
 import { join } from 'path';
 import { Request, Response } from 'express';
 import { TestComponent } from '../../utils/test-component';
+import { readFileSync } from 'fs';
 
 describe('IndexComponent', () => {
   let runtime: Runtime;
   let component: IndexComponent;
   let testComponent: TestComponent;
   let originalEnv: string | undefined;
+  let packageVersion: string;
 
   beforeAll(() => {
     originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'development';
+    // Read package version once for all tests
+    const packageJson = JSON.parse(
+      readFileSync(join(__dirname, '../../../../package.json'), 'utf-8')
+    );
+    packageVersion = packageJson.version;
   });
 
   afterAll(() => {
@@ -38,7 +45,7 @@ describe('IndexComponent', () => {
     it('should initialize with correct state', () => {
       const state = component.getState();
       expect(state.environment).toBe('development');
-      expect(state.frameworkVersion).toBe('0.1.0');
+      expect(state.frameworkVersion).toBe(packageVersion);
       expect(state.registeredComponents).toBeInstanceOf(Map);
     });
 
@@ -60,7 +67,7 @@ describe('IndexComponent', () => {
       const html = await component.render(viewData);
       expect(html).toContain('Welcome to AIFrame');
       expect(html).toContain('Quick Start');
-      expect(html).toContain('v0.1.0');
+      expect(html).toContain(`v${packageVersion}`);
     });
 
     it('should show registered components', async () => {
